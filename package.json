@@ -1,6 +1,6 @@
 {
   "name": "nekomaths",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Un package utilitaire mathématique simple et convivial par Nekoclem",
   "main": "index.js",
   "scripts": {
@@ -18,10 +18,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nekoclem/nekomaths.git"
+    "url": "https://github.com/clem27game/NEKOMATHS.git"
   },
   "bugs": {
-    "url": "https://github.com/nekoclem/nekomaths/issues"
+    "url": "https://github.com/clem27game/NEKOMATHS/issues"
   },
   "homepage": "https://github.com/nekoclem/nekomaths#readme"
 }
