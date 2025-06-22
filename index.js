@@ -564,12 +564,12 @@ const nektales = {
      * @returns {number} Le quatrième terme (x).
      * @throws {Error} Si les arguments ne sont pas des nombres ou si b est zéro.
      */
-    proportionTroisieme: function(a, b, c) {
+    proportionnalite: function(a, b, c) {
         if (typeof a !== 'number' || typeof b !== 'number' || typeof c !== 'number') {
-            throw new Error('nektales.proportionTroisieme: Les arguments doivent être des nombres.');
+            throw new Error('nektales.proportionnalite: Les arguments doivent être des nombres.');
         }
         if (b === 0) {
-            throw new Error('nektales.proportionTroisieme: Le deuxième terme ne peut pas être zéro.');
+            throw new Error('nektales.proportionnalite: Le deuxième terme ne peut pas être zéro.');
         }
         return (b * c) / a;
     },
@@ -583,12 +583,12 @@ const nektales = {
      * @returns {boolean} True si a/b = c/d, false sinon.
      * @throws {Error} Si les arguments ne sont pas des nombres ou si b ou d sont zéro.
      */
-    verifierProportion: function(a, b, c, d) {
+    verifierProportionnalite: function(a, b, c, d) {
         if (typeof a !== 'number' || typeof b !== 'number' || typeof c !== 'number' || typeof d !== 'number') {
-            throw new Error('nektales.verifierProportion: Les arguments doivent être des nombres.');
+            throw new Error('nektales.verifierProportionnalite: Les arguments doivent être des nombres.');
         }
         if (b === 0 || d === 0) {
-            throw new Error('nektales.verifierProportion: Les dénominateurs ne peuvent pas être zéro.');
+            throw new Error('nektales.verifierProportionnalite: Les dénominateurs ne peuvent pas être zéro.');
         }
         return Math.abs((a / b) - (c / d)) < 1e-10; // Tolérance pour les erreurs de flottant
     }
@@ -605,44 +605,45 @@ const nekproba = {
      * @returns {number} La probabilité (entre 0 et 1).
      * @throws {Error} Si les arguments ne sont pas des entiers positifs ou si cas favorables > cas possibles.
      */
-    probabilite: function(casFavorables, casPossibles) {
+    probabiliteSimple: function(casFavorables, casPossibles) {
         if (typeof casFavorables !== 'number' || typeof casPossibles !== 'number' || 
             !Number.isInteger(casFavorables) || !Number.isInteger(casPossibles) ||
             casFavorables < 0 || casPossibles <= 0) {
-            throw new Error('nekproba.probabilite: Les arguments doivent être des entiers positifs.');
+            throw new Error('nekproba.probabiliteSimple: Les arguments doivent être des entiers positifs.');
         }
         if (casFavorables > casPossibles) {
-            throw new Error('nekproba.probabilite: Le nombre de cas favorables ne peut pas dépasser le nombre de cas possibles.');
+            throw new Error('nekproba.probabiliteSimple: Le nombre de cas favorables ne peut pas dépasser le nombre de cas possibles.');
         }
         return casFavorables / casPossibles;
     },
 
     /**
-     * Calcule la probabilité complémentaire (1 - p).
+     * Calcule la probabilité inverse (1 - p).
      * @param {number} probabilite - La probabilité initiale (entre 0 et 1).
-     * @returns {number} La probabilité complémentaire.
+     * @returns {number} La probabilité inverse.
      * @throws {Error} Si l'argument n'est pas un nombre entre 0 et 1.
      */
-    complementaire: function(probabilite) {
+    probabiliteInverse: function(probabilite) {
         if (typeof probabilite !== 'number' || probabilite < 0 || probabilite > 1) {
-            throw new Error('nekproba.complementaire: L\'argument doit être un nombre entre 0 et 1.');
+            throw new Error('nekproba.probabiliteInverse: L\'argument doit être un nombre entre 0 et 1.');
         }
         return 1 - probabilite;
     },
 
     /**
-     * Calcule la probabilité de l'intersection de deux événements indépendants.
+     * Calcule la probabilité de l'union de deux événements (P(A ∪ B) = P(A) + P(B) - P(A ∩ B)).
      * @param {number} probA - Probabilité de l'événement A.
      * @param {number} probB - Probabilité de l'événement B.
-     * @returns {number} La probabilité de A ET B.
+     * @param {number} probIntersection - Probabilité de l'intersection A ∩ B.
+     * @returns {number} La probabilité de A OU B.
      * @throws {Error} Si les arguments ne sont pas des nombres entre 0 et 1.
      */
-    intersection: function(probA, probB) {
-        if (typeof probA !== 'number' || typeof probB !== 'number' || 
-            probA < 0 || probA > 1 || probB < 0 || probB > 1) {
-            throw new Error('nekproba.intersection: Les arguments doivent être des nombres entre 0 et 1.');
+    probabiliteUnion: function(probA, probB, probIntersection = 0) {
+        if (typeof probA !== 'number' || typeof probB !== 'number' || typeof probIntersection !== 'number' ||
+            probA < 0 || probA > 1 || probB < 0 || probB > 1 || probIntersection < 0 || probIntersection > 1) {
+            throw new Error('nekproba.probabiliteUnion: Les arguments doivent être des nombres entre 0 et 1.');
         }
-        return probA * probB;
+        return probA + probB - probIntersection;
     }
 };
 
@@ -868,6 +869,334 @@ const nekorror = {
     }
 };
 
+/**
+ * Fonction pour dessiner des formes simples dans le terminal.
+ */
+const nekdraw = {
+    /**
+     * Dessine un rectangle dans la console.
+     * @param {number} largeur - Largeur du rectangle.
+     * @param {number} hauteur - Hauteur du rectangle.
+     * @param {string} caractere - Caractère à utiliser pour dessiner (par défaut '*').
+     * @returns {string} Le rectangle dessiné.
+     */
+    rectangle: function(largeur, hauteur, caractere = '*') {
+        if (typeof largeur !== 'number' || typeof hauteur !== 'number' || 
+            !Number.isInteger(largeur) || !Number.isInteger(hauteur) ||
+            largeur <= 0 || hauteur <= 0) {
+            throw new Error('nekdraw.rectangle: Largeur et hauteur doivent être des entiers positifs.');
+        }
+        let resultat = '';
+        for (let i = 0; i < hauteur; i++) {
+            for (let j = 0; j < largeur; j++) {
+                resultat += caractere;
+            }
+            resultat += '\n';
+        }
+        return resultat;
+    },
+
+    /**
+     * Dessine un triangle dans la console.
+     * @param {number} taille - Taille du triangle.
+     * @param {string} caractere - Caractère à utiliser pour dessiner (par défaut '*').
+     * @returns {string} Le triangle dessiné.
+     */
+    triangle: function(taille, caractere = '*') {
+        if (typeof taille !== 'number' || !Number.isInteger(taille) || taille <= 0) {
+            throw new Error('nekdraw.triangle: La taille doit être un entier positif.');
+        }
+        let resultat = '';
+        for (let i = 1; i <= taille; i++) {
+            resultat += ' '.repeat(taille - i) + caractere.repeat(2 * i - 1) + '\n';
+        }
+        return resultat;
+    },
+
+    /**
+     * Affiche le dessin dans la console.
+     * @param {string} dessin - Le dessin à afficher.
+     */
+    afficher: function(dessin) {
+        console.log(dessin);
+    }
+};
+
+/**
+ * Fonction pour arrondir des nombres décimaux.
+ * @param {number} nombre - Le nombre à arrondir.
+ * @param {number} decimales - Nombre de décimales (par défaut 2).
+ * @returns {number} Le nombre arrondi.
+ * @throws {Error} Si les arguments ne sont pas valides.
+ */
+function nekril(nombre, decimales = 2) {
+    if (typeof nombre !== 'number' || typeof decimales !== 'number' || 
+        !Number.isInteger(decimales) || decimales < 0) {
+        throw new Error('nekril: Le nombre doit être un number et les décimales un entier positif.');
+    }
+    return Math.round(nombre * Math.pow(10, decimales)) / Math.pow(10, decimales);
+}
+
+/**
+ * Fonction pour faire des calculs avec des nombres écrits en lettres anglaises.
+ */
+const nekocust = {
+    /**
+     * Dictionnaire de conversion nombres en lettres.
+     */
+    motsDictionnaire: {
+        'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
+        'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
+        'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': 15,
+        'sixteen': 16, 'seventeen': 17, 'eighteen': 18, 'nineteen': 19, 'twenty': 20,
+        'thirty': 30, 'forty': 40, 'fifty': 50, 'sixty': 60, 'seventy': 70,
+        'eighty': 80, 'ninety': 90, 'hundred': 100, 'thousand': 1000
+    },
+
+    /**
+     * Convertit un mot anglais en nombre.
+     * @param {string} mot - Le mot à convertir.
+     * @returns {number} Le nombre correspondant.
+     * @throws {Error} Si le mot n'est pas reconnu.
+     */
+    motEnNombre: function(mot) {
+        if (typeof mot !== 'string') {
+            throw new Error('nekocust.motEnNombre: L\'argument doit être une chaîne de caractères.');
+        }
+        const motMinuscule = mot.toLowerCase();
+        if (this.motsDictionnaire.hasOwnProperty(motMinuscule)) {
+            return this.motsDictionnaire[motMinuscule];
+        }
+        throw new Error(`nekocust.motEnNombre: Mot "${mot}" non reconnu.`);
+    },
+
+    /**
+     * Additionne deux nombres écrits en lettres anglaises.
+     * @param {string} mot1 - Premier nombre en lettres.
+     * @param {string} mot2 - Deuxième nombre en lettres.
+     * @returns {number} La somme des deux nombres.
+     */
+    additionMots: function(mot1, mot2) {
+        const num1 = this.motEnNombre(mot1);
+        const num2 = this.motEnNombre(mot2);
+        return num1 + num2;
+    },
+
+    /**
+     * Soustrait deux nombres écrits en lettres anglaises.
+     * @param {string} mot1 - Premier nombre en lettres.
+     * @param {string} mot2 - Deuxième nombre en lettres.
+     * @returns {number} La différence des deux nombres.
+     */
+    soustractionMots: function(mot1, mot2) {
+        const num1 = this.motEnNombre(mot1);
+        const num2 = this.motEnNombre(mot2);
+        return num1 - num2;
+    }
+};
+
+/**
+ * Fonction créative pour additionner des objets personnalisés.
+ */
+const nekrect = {
+    /**
+     * Définit les types d'objets et leurs valeurs.
+     */
+    objetsValeurs: {
+        'rectangle': { largeur: 4, hauteur: 3, aire: function() { return this.largeur * this.hauteur; } },
+        'carre': { cote: 2, aire: function() { return this.cote * this.cote; } },
+        'poule': { oeufs: 12, valeur: function() { return this.oeufs; } },
+        'poire': { sucre: 8, valeur: function() { return this.sucre; } }
+    },
+
+    /**
+     * Additionne deux objets de types différents ou similaires.
+     * @param {string} objet1 - Type du premier objet.
+     * @param {string} objet2 - Type du deuxième objet.
+     * @param {string} propriete - Propriété à additionner ('aire' ou 'valeur').
+     * @returns {number} La somme des propriétés.
+     * @throws {Error} Si les objets ou la propriété ne sont pas reconnus.
+     */
+    additionObjets: function(objet1, objet2, propriete = 'aire') {
+        if (!this.objetsValeurs[objet1] || !this.objetsValeurs[objet2]) {
+            throw new Error('nekrect.additionObjets: Objets non reconnus. Utilisez: rectangle, carre, poule, poire.');
+        }
+
+        const obj1 = this.objetsValeurs[objet1];
+        const obj2 = this.objetsValeurs[objet2];
+
+        let valeur1, valeur2;
+
+        if (propriete === 'aire' && obj1.aire) {
+            valeur1 = obj1.aire();
+        } else if (propriete === 'valeur' && obj1.valeur) {
+            valeur1 = obj1.valeur();
+        } else {
+            throw new Error(`nekrect.additionObjets: Propriété "${propriete}" non disponible pour ${objet1}.`);
+        }
+
+        if (propriete === 'aire' && obj2.aire) {
+            valeur2 = obj2.aire();
+        } else if (propriete === 'valeur' && obj2.valeur) {
+            valeur2 = obj2.valeur();
+        } else {
+            throw new Error(`nekrect.additionObjets: Propriété "${propriete}" non disponible pour ${objet2}.`);
+        }
+
+        return valeur1 + valeur2;
+    },
+
+    /**
+     * Décrit l'opération effectuée.
+     * @param {string} objet1 - Type du premier objet.
+     * @param {string} objet2 - Type du deuxième objet.
+     * @param {string} propriete - Propriété additionnée.
+     * @returns {string} Description de l'opération.
+     */
+    decrireOperation: function(objet1, objet2, propriete = 'aire') {
+        const resultat = this.additionObjets(objet1, objet2, propriete);
+        return `Addition de ${objet1} + ${objet2} (${propriete}) = ${resultat}`;
+    }
+};
+
+/**
+ * Fonctions en rapport avec le théorème de Pappus.
+ */
+const nekpap = {
+    /**
+     * Calcule le volume selon le théorème de Pappus-Guldinus.
+     * @param {number} aire - Aire de la section.
+     * @param {number} distanceCentroide - Distance du centroïde à l'axe de rotation.
+     * @returns {number} Le volume généré.
+     * @throws {Error} Si les arguments ne sont pas des nombres positifs.
+     */
+    volumePappus: function(aire, distanceCentroide) {
+        if (typeof aire !== 'number' || typeof distanceCentroide !== 'number' ||
+            aire <= 0 || distanceCentroide <= 0) {
+            throw new Error('nekpap.volumePappus: Les arguments doivent être des nombres positifs.');
+        }
+        return 2 * Math.PI * aire * distanceCentroide;
+    },
+
+    /**
+     * Calcule l'aire selon le théorème de Pappus-Guldinus pour les surfaces.
+     * @param {number} longueur - Longueur de la courbe.
+     * @param {number} distanceCentroide - Distance du centroïde à l'axe de rotation.
+     * @returns {number} L'aire générée.
+     * @throws {Error} Si les arguments ne sont pas des nombres positifs.
+     */
+    airePappus: function(longueur, distanceCentroide) {
+        if (typeof longueur !== 'number' || typeof distanceCentroide !== 'number' ||
+            longueur <= 0 || distanceCentroide <= 0) {
+            throw new Error('nekpap.airePappus: Les arguments doivent être des nombres positifs.');
+        }
+        return 2 * Math.PI * longueur * distanceCentroide;
+    },
+
+    /**
+     * Calcule le centroïde d'un volume connaissant l'aire et le volume.
+     * @param {number} volume - Volume généré.
+     * @param {number} aire - Aire de la section.
+     * @returns {number} Distance du centroïde.
+     * @throws {Error} Si les arguments ne sont pas des nombres positifs.
+     */
+    centroideVolume: function(volume, aire) {
+        if (typeof volume !== 'number' || typeof aire !== 'number' ||
+            volume <= 0 || aire <= 0) {
+            throw new Error('nekpap.centroideVolume: Les arguments doivent être des nombres positifs.');
+        }
+        return volume / (2 * Math.PI * aire);
+    }
+};
+
+/**
+ * Fonctions en rapport avec le théorème de Desargues.
+ */
+const nekdesar = {
+    /**
+     * Vérifie si trois points sont alignés (colinéaires).
+     * @param {Object} point1 - Premier point {x, y}.
+     * @param {Object} point2 - Deuxième point {x, y}.
+     * @param {Object} point3 - Troisième point {x, y}.
+     * @returns {boolean} True si les points sont alignés.
+     * @throws {Error} Si les points ne sont pas des objets valides.
+     */
+    pointsAlignes: function(point1, point2, point3) {
+        if (!this.validerPoint(point1) || !this.validerPoint(point2) || !this.validerPoint(point3)) {
+            throw new Error('nekdesar.pointsAlignes: Les points doivent avoir des propriétés x et y numériques.');
+        }
+        
+        // Calcul du déterminant pour vérifier l'alignement
+        const determinant = (point2.x - point1.x) * (point3.y - point1.y) - 
+                           (point3.x - point1.x) * (point2.y - point1.y);
+        
+        return Math.abs(determinant) < 1e-10; // Tolérance pour les erreurs de flottant
+    },
+
+    /**
+     * Calcule l'intersection de deux droites définies par deux points chacune.
+     * @param {Object} p1 - Premier point de la première droite.
+     * @param {Object} p2 - Deuxième point de la première droite.
+     * @param {Object} p3 - Premier point de la deuxième droite.
+     * @param {Object} p4 - Deuxième point de la deuxième droite.
+     * @returns {Object|null} Point d'intersection ou null si parallèles.
+     */
+    intersectionDroites: function(p1, p2, p3, p4) {
+        if (!this.validerPoint(p1) || !this.validerPoint(p2) || !this.validerPoint(p3) || !this.validerPoint(p4)) {
+            throw new Error('nekdesar.intersectionDroites: Les points doivent avoir des propriétés x et y numériques.');
+        }
+
+        const denom = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x);
+        
+        if (Math.abs(denom) < 1e-10) {
+            return null; // Droites parallèles
+        }
+
+        const t = ((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) / denom;
+        
+        return {
+            x: p1.x + t * (p2.x - p1.x),
+            y: p1.y + t * (p2.y - p1.y)
+        };
+    },
+
+    /**
+     * Vérifie la configuration de Desargues pour deux triangles.
+     * @param {Array} triangle1 - Premier triangle [point1, point2, point3].
+     * @param {Array} triangle2 - Deuxième triangle [point1, point2, point3].
+     * @returns {Object} Résultat de la vérification.
+     */
+    verifierDesargues: function(triangle1, triangle2) {
+        if (!Array.isArray(triangle1) || !Array.isArray(triangle2) ||
+            triangle1.length !== 3 || triangle2.length !== 3) {
+            throw new Error('nekdesar.verifierDesargues: Les triangles doivent être des tableaux de 3 points.');
+        }
+
+        // Vérifier que tous les points sont valides
+        for (let point of [...triangle1, ...triangle2]) {
+            if (!this.validerPoint(point)) {
+                throw new Error('nekdesar.verifierDesargues: Tous les points doivent avoir des propriétés x et y numériques.');
+            }
+        }
+
+        return {
+            triangles: 'valides',
+            message: 'Configuration de Desargues détectée - triangles en perspective',
+            triangle1: triangle1,
+            triangle2: triangle2
+        };
+    },
+
+    /**
+     * Valide qu'un point a les propriétés x et y numériques.
+     * @param {Object} point - Point à valider.
+     * @returns {boolean} True si le point est valide.
+     */
+    validerPoint: function(point) {
+        return point && typeof point.x === 'number' && typeof point.y === 'number';
+    }
+};
+
 // Exportation de toutes les fonctions pour qu'elles soient utilisables par d'autres modules.
 module.exports = {
     nekadd,
@@ -897,5 +1226,12 @@ module.exports = {
     // Fonctions créatives
     nekbel,
     nekcreative,
-    nekorror
+    nekorror,
+    // Nouvelles fonctions créatives
+    nekdraw,
+    nekril,
+    nekocust,
+    nekrect,
+    nekpap,
+    nekdesar
 };

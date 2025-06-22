@@ -292,6 +292,116 @@ nekomaths.nekorror.log("info", "Calcul en cours...");
 nekomaths.nekorror.log("error", "Une erreur est survenue", {valeur: 42});
 ```
 
+## 12. Nouvelles Fonctionnalités Créatives
+
+### 12.1 Dessin ASCII (nekdraw)
+ * `nekdraw.rectangle(largeur, hauteur, caractere)` : Dessine un rectangle dans la console.
+ * `nekdraw.triangle(taille, caractere)` : Dessine un triangle dans la console.
+ * `nekdraw.afficher(dessin)` : Affiche le dessin dans la console.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Dessiner un rectangle
+const rect = nekomaths.nekdraw.rectangle(5, 3, '#');
+nekomaths.nekdraw.afficher(rect);
+// Affiche:
+// #####
+// #####
+// #####
+
+// Dessiner un triangle
+const triangle = nekomaths.nekdraw.triangle(4, '*');
+nekomaths.nekdraw.afficher(triangle);
+// Affiche:
+//    *
+//   ***
+//  *****
+// *******
+```
+
+### 12.2 Arrondi Personnalisé (nekril)
+ * `nekril(nombre, decimales)` : Arrondit un nombre décimal au nombre de décimales spécifié.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+console.log(nekomaths.nekril(3.14159, 2)); // Renvoie 3.14
+console.log(nekomaths.nekril(2.7777777, 4)); // Renvoie 2.7778
+console.log(nekomaths.nekril(10.555, 1)); // Renvoie 10.6
+```
+
+### 12.3 Calculs avec Mots Anglais (nekocust)
+ * `nekocust.motEnNombre(mot)` : Convertit un mot anglais en nombre.
+ * `nekocust.additionMots(mot1, mot2)` : Additionne deux nombres écrits en lettres.
+ * `nekocust.soustractionMots(mot1, mot2)` : Soustrait deux nombres écrits en lettres.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+console.log(nekomaths.nekocust.motEnNombre("four")); // Renvoie 4
+console.log(nekomaths.nekocust.additionMots("three", "seven")); // Renvoie 10
+console.log(nekomaths.nekocust.soustractionMots("ten", "four")); // Renvoie 6
+```
+
+### 12.4 Addition d'Objets Créatifs (nekrect)
+ * `nekrect.additionObjets(objet1, objet2, propriete)` : Additionne deux objets selon une propriété.
+ * `nekrect.decrireOperation(objet1, objet2, propriete)` : Décrit l'opération effectuée.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Addition d'aires
+console.log(nekomaths.nekrect.additionObjets("rectangle", "carre", "aire")); // Renvoie 16
+console.log(nekomaths.nekrect.additionObjets("poule", "poire", "valeur")); // Renvoie 20
+
+// Description de l'opération
+console.log(nekomaths.nekrect.decrireOperation("rectangle", "carre", "aire"));
+// Renvoie: "Addition de rectangle + carre (aire) = 16"
+```
+
+## 13. Théorèmes Géométriques Avancés
+
+### 13.1 Théorème de Pappus (nekpap)
+ * `nekpap.volumePappus(aire, distanceCentroide)` : Calcule le volume selon Pappus-Guldinus.
+ * `nekpap.airePappus(longueur, distanceCentroide)` : Calcule l'aire selon Pappus-Guldinus.
+ * `nekpap.centroideVolume(volume, aire)` : Calcule la distance du centroïde.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+console.log("Volume Pappus :", nekomaths.nekpap.volumePappus(10, 5)); // Volume généré
+console.log("Aire Pappus :", nekomaths.nekpap.airePappus(8, 3)); // Aire générée
+console.log("Centroïde :", nekomaths.nekpap.centroideVolume(100, 4)); // Distance centroïde
+```
+
+### 13.2 Théorème de Desargues (nekdesar)
+ * `nekdesar.pointsAlignes(point1, point2, point3)` : Vérifie si trois points sont alignés.
+ * `nekdesar.intersectionDroites(p1, p2, p3, p4)` : Calcule l'intersection de deux droites.
+ * `nekdesar.verifierDesargues(triangle1, triangle2)` : Vérifie la configuration de Desargues.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Vérifier l'alignement
+const p1 = {x: 0, y: 0};
+const p2 = {x: 1, y: 1};
+const p3 = {x: 2, y: 2};
+console.log(nekomaths.nekdesar.pointsAlignes(p1, p2, p3)); // Renvoie true
+
+// Intersection de droites
+const intersection = nekomaths.nekdesar.intersectionDroites(
+    {x: 0, y: 0}, {x: 2, y: 2},
+    {x: 0, y: 2}, {x: 2, y: 0}
+);
+console.log(intersection); // {x: 1, y: 1}
+
+// Configuration de Desargues
+const triangle1 = [{x: 0, y: 0}, {x: 2, y: 0}, {x: 1, y: 2}];
+const triangle2 = [{x: 1, y: 1}, {x: 3, y: 1}, {x: 2, y: 3}];
+console.log(nekomaths.nekdesar.verifierDesargues(triangle1, triangle2));
+```
+
 **Contribution**
 
 Les contributions sont les bienvenues ! Si vous avez des idées de nouvelles fonctions, des améliorations ou des corrections de bugs, n'hésitez pas à ouvrir une issue ou à soumettre une pull request sur le dépôt GitHub.
