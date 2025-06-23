@@ -1,6 +1,9 @@
 
 **Nekomaths**
 
+![🍭💖nekomaths💖🍭](http://www.image-heberg.fr/files/17506757603536301054.webp)
+
+
 Un package Node.js simple et convivial, développé par nekoclem, offrant des fonctions mathématiques de base, des utilitaires pratiques et des outils plus spécifiques pour vos projets.
 
 **Installation**
