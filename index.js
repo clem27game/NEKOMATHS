@@ -1197,6 +1197,736 @@ const nekdesar = {
     }
 };
 
+/**
+ * Résolveur d'équations simples avec variable x.
+ */
+const nekident = {
+    /**
+     * Résout une équation de type ax + b = c pour trouver x.
+     * @param {number} a - Coefficient de x.
+     * @param {number} b - Constante additionnelle.
+     * @param {number} resultat - Résultat attendu.
+     * @returns {number} La valeur de x.
+     */
+    resoudreLineaire: function(a, b, resultat) {
+        if (typeof a !== 'number' || typeof b !== 'number' || typeof resultat !== 'number') {
+            throw new Error('nekident.resoudreLineaire: Tous les arguments doivent être des nombres.');
+        }
+        if (a === 0) {
+            throw new Error('nekident.resoudreLineaire: Le coefficient de x ne peut pas être zéro.');
+        }
+        return (resultat - b) / a;
+    },
+
+    /**
+     * Vérifie une solution dans une équation donnée.
+     * @param {number} x - Valeur de x à vérifier.
+     * @param {string} operation - Type d'opération ('add', 'sub', 'mult', 'div').
+     * @param {number} operande - Nombre avec lequel opérer.
+     * @param {number} resultatAttendu - Résultat attendu.
+     * @returns {boolean} True si la solution est correcte.
+     */
+    verifierSolution: function(x, operation, operande, resultatAttendu) {
+        let resultat;
+        switch (operation) {
+            case 'add':
+                resultat = x + operande;
+                break;
+            case 'sub':
+                resultat = x - operande;
+                break;
+            case 'mult':
+                resultat = x * operande;
+                break;
+            case 'div':
+                if (operande === 0) throw new Error('Division par zéro impossible.');
+                resultat = x / operande;
+                break;
+            default:
+                throw new Error('nekident.verifierSolution: Opération non supportée.');
+        }
+        return Math.abs(resultat - resultatAttendu) < 1e-10;
+    },
+
+    /**
+     * Trouve x pour une opération donnée.
+     * @param {string} operation - Type d'opération ('add', 'sub', 'mult', 'div').
+     * @param {number} operande - Nombre avec lequel opérer.
+     * @param {number} resultatAttendu - Résultat attendu.
+     * @returns {number} La valeur de x.
+     */
+    trouverX: function(operation, operande, resultatAttendu) {
+        switch (operation) {
+            case 'add':
+                return resultatAttendu - operande;
+            case 'sub':
+                return resultatAttendu + operande;
+            case 'mult':
+                if (operande === 0) throw new Error('Impossible de diviser par zéro.');
+                return resultatAttendu / operande;
+            case 'div':
+                return resultatAttendu * operande;
+            default:
+                throw new Error('nekident.trouverX: Opération non supportée.');
+        }
+    }
+};
+
+/**
+ * Résolveur d'équations complexes.
+ */
+const nekaqua = {
+    /**
+     * Résout une équation quadratique ax² + bx + c = 0.
+     * @param {number} a - Coefficient de x².
+     * @param {number} b - Coefficient de x.
+     * @param {number} c - Constante.
+     * @returns {Object} Solutions de l'équation.
+     */
+    quadratique: function(a, b, c) {
+        if (typeof a !== 'number' || typeof b !== 'number' || typeof c !== 'number') {
+            throw new Error('nekaqua.quadratique: Tous les arguments doivent être des nombres.');
+        }
+        if (a === 0) {
+            throw new Error('nekaqua.quadratique: Le coefficient de x² ne peut pas être zéro.');
+        }
+
+        const discriminant = b * b - 4 * a * c;
+        
+        if (discriminant > 0) {
+            const x1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+            const x2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+            return { type: 'deux_solutions', x1: x1, x2: x2, discriminant: discriminant };
+        } else if (discriminant === 0) {
+            const x = -b / (2 * a);
+            return { type: 'une_solution', x: x, discriminant: discriminant };
+        } else {
+            return { type: 'aucune_solution_reelle', discriminant: discriminant };
+        }
+    },
+
+    /**
+     * Résout un système d'équations 2x2.
+     * @param {number} a1 - Coefficient de x dans la première équation.
+     * @param {number} b1 - Coefficient de y dans la première équation.
+     * @param {number} c1 - Constante de la première équation.
+     * @param {number} a2 - Coefficient de x dans la deuxième équation.
+     * @param {number} b2 - Coefficient de y dans la deuxième équation.
+     * @param {number} c2 - Constante de la deuxième équation.
+     * @returns {Object} Solution du système.
+     */
+    systeme2x2: function(a1, b1, c1, a2, b2, c2) {
+        const determinant = a1 * b2 - a2 * b1;
+        
+        if (Math.abs(determinant) < 1e-10) {
+            return { type: 'aucune_solution_unique', message: 'Système indéterminé ou incompatible' };
+        }
+
+        const x = (c1 * b2 - c2 * b1) / determinant;
+        const y = (a1 * c2 - a2 * c1) / determinant;
+        
+        return { type: 'solution_unique', x: x, y: y };
+    },
+
+    /**
+     * Évalue une expression polynomiale.
+     * @param {Array} coefficients - Coefficients du polynôme (du plus haut degré au plus bas).
+     * @param {number} x - Valeur de x.
+     * @returns {number} Résultat de l'évaluation.
+     */
+    evaluerPolynome: function(coefficients, x) {
+        if (!Array.isArray(coefficients) || coefficients.some(c => typeof c !== 'number')) {
+            throw new Error('nekaqua.evaluerPolynome: Les coefficients doivent être un tableau de nombres.');
+        }
+        let resultat = 0;
+        for (let i = 0; i < coefficients.length; i++) {
+            resultat += coefficients[i] * Math.pow(x, coefficients.length - 1 - i);
+        }
+        return resultat;
+    }
+};
+
+/**
+ * Calculateur de fractions.
+ */
+const nekfrac = {
+    /**
+     * Simplifie une fraction.
+     * @param {number} numerateur - Numérateur de la fraction.
+     * @param {number} denominateur - Dénominateur de la fraction.
+     * @returns {Object} Fraction simplifiée.
+     */
+    simplifier: function(numerateur, denominateur) {
+        if (typeof numerateur !== 'number' || typeof denominateur !== 'number' ||
+            !Number.isInteger(numerateur) || !Number.isInteger(denominateur)) {
+            throw new Error('nekfrac.simplifier: Les arguments doivent être des entiers.');
+        }
+        if (denominateur === 0) {
+            throw new Error('nekfrac.simplifier: Le dénominateur ne peut pas être zéro.');
+        }
+
+        const pgcd = this.pgcd(Math.abs(numerateur), Math.abs(denominateur));
+        return {
+            numerateur: numerateur / pgcd,
+            denominateur: denominateur / pgcd,
+            decimal: (numerateur / pgcd) / (denominateur / pgcd)
+        };
+    },
+
+    /**
+     * Additionne deux fractions.
+     * @param {number} num1 - Numérateur de la première fraction.
+     * @param {number} den1 - Dénominateur de la première fraction.
+     * @param {number} num2 - Numérateur de la deuxième fraction.
+     * @param {number} den2 - Dénominateur de la deuxième fraction.
+     * @returns {Object} Résultat de l'addition.
+     */
+    additionner: function(num1, den1, num2, den2) {
+        const nouveauNum = num1 * den2 + num2 * den1;
+        const nouveauDen = den1 * den2;
+        return this.simplifier(nouveauNum, nouveauDen);
+    },
+
+    /**
+     * Multiplie deux fractions.
+     * @param {number} num1 - Numérateur de la première fraction.
+     * @param {number} den1 - Dénominateur de la première fraction.
+     * @param {number} num2 - Numérateur de la deuxième fraction.
+     * @param {number} den2 - Dénominateur de la deuxième fraction.
+     * @returns {Object} Résultat de la multiplication.
+     */
+    multiplier: function(num1, den1, num2, den2) {
+        const nouveauNum = num1 * num2;
+        const nouveauDen = den1 * den2;
+        return this.simplifier(nouveauNum, nouveauDen);
+    },
+
+    /**
+     * Calcule le PGCD de deux nombres.
+     * @param {number} a - Premier nombre.
+     * @param {number} b - Deuxième nombre.
+     * @returns {number} PGCD des deux nombres.
+     */
+    pgcd: function(a, b) {
+        while (b !== 0) {
+            const temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+};
+
+/**
+ * Calculateur avec puissances et racines.
+ */
+const nektin = {
+    /**
+     * Résout une équation avec x au carré : ax² = b.
+     * @param {number} a - Coefficient de x².
+     * @param {number} b - Résultat attendu.
+     * @returns {Object} Solutions de l'équation.
+     */
+    resoudreCarree: function(a, b) {
+        if (typeof a !== 'number' || typeof b !== 'number') {
+            throw new Error('nektin.resoudreCarree: Les arguments doivent être des nombres.');
+        }
+        if (a === 0) {
+            throw new Error('nektin.resoudreCarree: Le coefficient ne peut pas être zéro.');
+        }
+        
+        const valeur = b / a;
+        if (valeur < 0) {
+            return { type: 'aucune_solution_reelle', message: 'Racine carrée d\'un nombre négatif' };
+        } else if (valeur === 0) {
+            return { type: 'une_solution', x: 0 };
+        } else {
+            const racine = Math.sqrt(valeur);
+            return { type: 'deux_solutions', x1: racine, x2: -racine };
+        }
+    },
+
+    /**
+     * Résout une équation avec x au cube : ax³ = b.
+     * @param {number} a - Coefficient de x³.
+     * @param {number} b - Résultat attendu.
+     * @returns {Object} Solution de l'équation.
+     */
+    resoudreCube: function(a, b) {
+        if (typeof a !== 'number' || typeof b !== 'number') {
+            throw new Error('nektin.resoudreCube: Les arguments doivent être des nombres.');
+        }
+        if (a === 0) {
+            throw new Error('nektin.resoudreCube: Le coefficient ne peut pas être zéro.');
+        }
+        
+        const valeur = b / a;
+        const racine = Math.cbrt(valeur);
+        return { type: 'une_solution', x: racine };
+    },
+
+    /**
+     * Calcule une fraction avec exposants.
+     * @param {number} num - Numérateur.
+     * @param {number} den - Dénominateur.
+     * @param {number} exposant - Exposant à appliquer à la fraction.
+     * @returns {Object} Résultat avec exposant.
+     */
+    fractionPuissance: function(num, den, exposant) {
+        if (typeof num !== 'number' || typeof den !== 'number' || typeof exposant !== 'number') {
+            throw new Error('nektin.fractionPuissance: Tous les arguments doivent être des nombres.');
+        }
+        if (den === 0) {
+            throw new Error('nektin.fractionPuissance: Le dénominateur ne peut pas être zéro.');
+        }
+        
+        const nouveauNum = Math.pow(num, exposant);
+        const nouveauDen = Math.pow(den, exposant);
+        
+        return {
+            numerateur: nouveauNum,
+            denominateur: nouveauDen,
+            decimal: nouveauNum / nouveauDen,
+            exposant: exposant
+        };
+    }
+};
+
+/**
+ * Fonctions liées au nombre alpha (constante de Feigenbaum).
+ */
+const nekalpha = {
+    /**
+     * Valeur approximative de la constante alpha de Feigenbaum.
+     */
+    valeur: 2.5029078750958928,
+
+    /**
+     * Calcule une série basée sur alpha.
+     * @param {number} n - Nombre de termes.
+     * @returns {number} Somme de la série.
+     */
+    serie: function(n) {
+        if (typeof n !== 'number' || !Number.isInteger(n) || n <= 0) {
+            throw new Error('nekalpha.serie: n doit être un entier positif.');
+        }
+        let somme = 0;
+        for (let i = 1; i <= n; i++) {
+            somme += this.valeur / Math.pow(i, 2);
+        }
+        return somme;
+    },
+
+    /**
+     * Applique une transformation alpha à un nombre.
+     * @param {number} x - Nombre à transformer.
+     * @returns {number} Résultat de la transformation.
+     */
+    transformation: function(x) {
+        if (typeof x !== 'number') {
+            throw new Error('nekalpha.transformation: L\'argument doit être un nombre.');
+        }
+        return this.valeur * x * (1 - x);
+    }
+};
+
+/**
+ * Fonctions liées au nombre beta.
+ */
+const nekbeta = {
+    /**
+     * Valeur de la constante beta (fonction beta d'Euler).
+     */
+    valeur: 1.5707963267948966, // π/2 comme approximation
+
+    /**
+     * Calcule la fonction beta pour deux paramètres.
+     * @param {number} a - Premier paramètre.
+     * @param {number} b - Deuxième paramètre.
+     * @returns {number} Valeur de la fonction beta.
+     */
+    fonction: function(a, b) {
+        if (typeof a !== 'number' || typeof b !== 'number' || a <= 0 || b <= 0) {
+            throw new Error('nekbeta.fonction: Les paramètres doivent être des nombres positifs.');
+        }
+        // Approximation simple de la fonction beta
+        return (this.gamma(a) * this.gamma(b)) / this.gamma(a + b);
+    },
+
+    /**
+     * Approximation simple de la fonction gamma.
+     * @param {number} x - Paramètre.
+     * @returns {number} Valeur approximative de gamma(x).
+     */
+    gamma: function(x) {
+        if (x <= 0) return Infinity;
+        if (x === 1) return 1;
+        if (x === 2) return 1;
+        // Approximation de Stirling pour des valeurs plus grandes
+        return Math.sqrt(2 * Math.PI / x) * Math.pow(x / Math.E, x);
+    },
+
+    /**
+     * Distribution beta simplifiée.
+     * @param {number} x - Valeur entre 0 et 1.
+     * @param {number} alpha - Paramètre alpha.
+     * @param {number} beta - Paramètre beta.
+     * @returns {number} Densité de probabilité.
+     */
+    distribution: function(x, alpha, beta) {
+        if (x < 0 || x > 1) {
+            throw new Error('nekbeta.distribution: x doit être entre 0 et 1.');
+        }
+        return Math.pow(x, alpha - 1) * Math.pow(1 - x, beta - 1);
+    }
+};
+
+/**
+ * Fonctions liées au nombre omega.
+ */
+const nekomega = {
+    /**
+     * Constante omega (nombre d'or conjugué).
+     */
+    valeur: 0.6180339887498948,
+
+    /**
+     * Calcule la spirale d'or basée sur omega.
+     * @param {number} t - Paramètre de temps.
+     * @returns {Object} Coordonnées polaires.
+     */
+    spirale: function(t) {
+        if (typeof t !== 'number') {
+            throw new Error('nekomega.spirale: Le paramètre doit être un nombre.');
+        }
+        const r = Math.exp(this.valeur * t);
+        const theta = t;
+        return {
+            r: r,
+            theta: theta,
+            x: r * Math.cos(theta),
+            y: r * Math.sin(theta)
+        };
+    },
+
+    /**
+     * Suite de Fibonacci modifiée avec omega.
+     * @param {number} n - Index de la suite.
+     * @returns {number} n-ième terme modifié.
+     */
+    fibonacciOmega: function(n) {
+        if (typeof n !== 'number' || !Number.isInteger(n) || n < 0) {
+            throw new Error('nekomega.fibonacciOmega: n doit être un entier non négatif.');
+        }
+        const phi = (1 + Math.sqrt(5)) / 2; // Nombre d'or
+        return Math.round((Math.pow(phi, n) - Math.pow(-this.valeur, n)) / Math.sqrt(5));
+    },
+
+    /**
+     * Calcul de convergence omega.
+     * @param {number} iterations - Nombre d'itérations.
+     * @returns {number} Valeur de convergence.
+     */
+    convergence: function(iterations) {
+        if (typeof iterations !== 'number' || !Number.isInteger(iterations) || iterations <= 0) {
+            throw new Error('nekomega.convergence: iterations doit être un entier positif.');
+        }
+        let valeur = 1;
+        for (let i = 0; i < iterations; i++) {
+            valeur = Math.exp(-valeur);
+        }
+        return valeur;
+    }
+};
+
+/**
+ * Comparateur de nombres.
+ */
+const nekcopare = {
+    /**
+     * Compare deux nombres et retourne le résultat.
+     * @param {number} a - Premier nombre.
+     * @param {number} b - Deuxième nombre.
+     * @returns {Object} Résultat de la comparaison.
+     */
+    comparer: function(a, b) {
+        if (typeof a !== 'number' || typeof b !== 'number') {
+            throw new Error('nekcopare.comparer: Les arguments doivent être des nombres.');
+        }
+        
+        let relation;
+        let symbole;
+        
+        if (a > b) {
+            relation = 'plus_grand';
+            symbole = '>';
+        } else if (a < b) {
+            relation = 'plus_petit';
+            symbole = '<';
+        } else {
+            relation = 'egal';
+            symbole = '=';
+        }
+        
+        return {
+            a: a,
+            b: b,
+            relation: relation,
+            symbole: symbole,
+            message: `${a} ${symbole} ${b}`,
+            difference: Math.abs(a - b)
+        };
+    },
+
+    /**
+     * Trouve le plus grand nombre dans un tableau.
+     * @param {Array} nombres - Tableau de nombres.
+     * @returns {Object} Informations sur le plus grand nombre.
+     */
+    maximum: function(nombres) {
+        if (!Array.isArray(nombres) || nombres.length === 0) {
+            throw new Error('nekcopare.maximum: L\'argument doit être un tableau non vide.');
+        }
+        if (nombres.some(n => typeof n !== 'number')) {
+            throw new Error('nekcopare.maximum: Tous les éléments doivent être des nombres.');
+        }
+        
+        const max = Math.max(...nombres);
+        const index = nombres.indexOf(max);
+        
+        return {
+            valeur: max,
+            index: index,
+            tableau: nombres
+        };
+    },
+
+    /**
+     * Trouve le plus petit nombre dans un tableau.
+     * @param {Array} nombres - Tableau de nombres.
+     * @returns {Object} Informations sur le plus petit nombre.
+     */
+    minimum: function(nombres) {
+        if (!Array.isArray(nombres) || nombres.length === 0) {
+            throw new Error('nekcopare.minimum: L\'argument doit être un tableau non vide.');
+        }
+        if (nombres.some(n => typeof n !== 'number')) {
+            throw new Error('nekcopare.minimum: Tous les éléments doivent être des nombres.');
+        }
+        
+        const min = Math.min(...nombres);
+        const index = nombres.indexOf(min);
+        
+        return {
+            valeur: min,
+            index: index,
+            tableau: nombres
+        };
+    }
+};
+
+/**
+ * Créateur de bases de données personnalisées.
+ */
+const nekdone = {
+    /**
+     * Stockage des bases de données.
+     */
+    bases: new Map(),
+
+    /**
+     * Crée une nouvelle base de données.
+     * @param {string} nom - Nom de la base de données.
+     * @param {Array} structure - Structure des colonnes.
+     * @returns {Object} Base de données créée.
+     */
+    creerBase: function(nom, structure = []) {
+        if (typeof nom !== 'string') {
+            throw new Error('nekdone.creerBase: Le nom doit être une chaîne de caractères.');
+        }
+        
+        const base = {
+            nom: nom,
+            structure: structure,
+            donnees: [],
+            creeLe: new Date(),
+            operations: []
+        };
+        
+        this.bases.set(nom, base);
+        return base;
+    },
+
+    /**
+     * Ajoute des données à une base.
+     * @param {string} nomBase - Nom de la base de données.
+     * @param {Object} donnee - Donnée à ajouter.
+     * @returns {boolean} Succès de l'opération.
+     */
+    ajouterDonnee: function(nomBase, donnee) {
+        const base = this.bases.get(nomBase);
+        if (!base) {
+            throw new Error('nekdone.ajouterDonnee: Base de données non trouvée.');
+        }
+        
+        base.donnees.push({
+            id: base.donnees.length + 1,
+            donnee: donnee,
+            ajouteLe: new Date()
+        });
+        
+        base.operations.push({
+            type: 'ajout',
+            timestamp: new Date(),
+            donnee: donnee
+        });
+        
+        return true;
+    },
+
+    /**
+     * Effectue des calculs sur les données numériques.
+     * @param {string} nomBase - Nom de la base de données.
+     * @param {string} propriete - Propriété à calculer.
+     * @param {string} operation - Type de calcul ('somme', 'moyenne', 'max', 'min').
+     * @returns {number} Résultat du calcul.
+     */
+    calculer: function(nomBase, propriete, operation) {
+        const base = this.bases.get(nomBase);
+        if (!base) {
+            throw new Error('nekdone.calculer: Base de données non trouvée.');
+        }
+        
+        const valeurs = base.donnees
+            .map(item => item.donnee[propriete])
+            .filter(val => typeof val === 'number');
+        
+        if (valeurs.length === 0) {
+            throw new Error('nekdone.calculer: Aucune valeur numérique trouvée pour cette propriété.');
+        }
+        
+        switch (operation) {
+            case 'somme':
+                return valeurs.reduce((acc, val) => acc + val, 0);
+            case 'moyenne':
+                return valeurs.reduce((acc, val) => acc + val, 0) / valeurs.length;
+            case 'max':
+                return Math.max(...valeurs);
+            case 'min':
+                return Math.min(...valeurs);
+            default:
+                throw new Error('nekdone.calculer: Opération non supportée.');
+        }
+    },
+
+    /**
+     * Obtient les informations d'une base.
+     * @param {string} nomBase - Nom de la base de données.
+     * @returns {Object} Informations de la base.
+     */
+    obtenirBase: function(nomBase) {
+        const base = this.bases.get(nomBase);
+        if (!base) {
+            throw new Error('nekdone.obtenirBase: Base de données non trouvée.');
+        }
+        return base;
+    }
+};
+
+/**
+ * Arithmétique avec fonctions personnalisées.
+ */
+const nekarin = {
+    /**
+     * Stockage des fonctions personnalisées.
+     */
+    fonctions: new Map(),
+
+    /**
+     * Enregistre une fonction personnalisée.
+     * @param {string} nom - Nom de la fonction.
+     * @param {Function} fonction - Fonction à enregistrer.
+     * @param {string} description - Description de la fonction.
+     * @returns {boolean} Succès de l'enregistrement.
+     */
+    enregistrerFonction: function(nom, fonction, description = '') {
+        if (typeof nom !== 'string' || typeof fonction !== 'function') {
+            throw new Error('nekarin.enregistrerFonction: Nom invalide ou fonction non valide.');
+        }
+        
+        this.fonctions.set(nom, {
+            fonction: fonction,
+            description: description,
+            nom: nom,
+            creeLe: new Date()
+        });
+        
+        return true;
+    },
+
+    /**
+     * Exécute une fonction personnalisée.
+     * @param {string} nom - Nom de la fonction.
+     * @param {...*} args - Arguments de la fonction.
+     * @returns {*} Résultat de la fonction.
+     */
+    executer: function(nom, ...args) {
+        const fonctionInfo = this.fonctions.get(nom);
+        if (!fonctionInfo) {
+            throw new Error('nekarin.executer: Fonction non trouvée.');
+        }
+        
+        try {
+            return fonctionInfo.fonction.apply(null, args);
+        } catch (error) {
+            throw new Error(`nekarin.executer: Erreur lors de l'exécution de ${nom}: ${error.message}`);
+        }
+    },
+
+    /**
+     * Combine deux fonctions avec une opération arithmétique.
+     * @param {string} nom1 - Nom de la première fonction.
+     * @param {string} nom2 - Nom de la deuxième fonction.
+     * @param {string} operation - Opération ('add', 'sub', 'mult', 'div').
+     * @param {...*} args - Arguments pour les fonctions.
+     * @returns {*} Résultat de l'opération combinée.
+     */
+    combiner: function(nom1, nom2, operation, ...args) {
+        const resultat1 = this.executer(nom1, ...args);
+        const resultat2 = this.executer(nom2, ...args);
+        
+        if (typeof resultat1 !== 'number' || typeof resultat2 !== 'number') {
+            throw new Error('nekarin.combiner: Les fonctions doivent retourner des nombres.');
+        }
+        
+        switch (operation) {
+            case 'add':
+                return resultat1 + resultat2;
+            case 'sub':
+                return resultat1 - resultat2;
+            case 'mult':
+                return resultat1 * resultat2;
+            case 'div':
+                if (resultat2 === 0) throw new Error('Division par zéro.');
+                return resultat1 / resultat2;
+            default:
+                throw new Error('nekarin.combiner: Opération non supportée.');
+        }
+    },
+
+    /**
+     * Liste toutes les fonctions enregistrées.
+     * @returns {Array} Liste des fonctions.
+     */
+    listerFonctions: function() {
+        return Array.from(this.fonctions.entries()).map(([nom, info]) => ({
+            nom: nom,
+            description: info.description,
+            creeLe: info.creeLe
+        }));
+    }
+};
+
 // Exportation de toutes les fonctions pour qu'elles soient utilisables par d'autres modules.
 module.exports = {
     nekadd,
@@ -1233,5 +1963,16 @@ module.exports = {
     nekocust,
     nekrect,
     nekpap,
-    nekdesar
+    nekdesar,
+    // Nouvelles fonctionnalités v1.4.0
+    nekident,
+    nekaqua,
+    nekfrac,
+    nektin,
+    nekalpha,
+    nekbeta,
+    nekomega,
+    nekcopare,
+    nekdone,
+    nekarin
 };

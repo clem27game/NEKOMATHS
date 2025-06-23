@@ -402,6 +402,194 @@ const triangle2 = [{x: 1, y: 1}, {x: 3, y: 1}, {x: 2, y: 3}];
 console.log(nekomaths.nekdesar.verifierDesargues(triangle1, triangle2));
 ```
 
+## 14. Nouvelles Fonctionnalités v1.4.0
+
+### 14.1 Résolution d'Équations avec Variable (nekident)
+ * `nekident.resoudreLineaire(a, b, resultat)` : Résout ax + b = resultat pour trouver x.
+ * `nekident.verifierSolution(x, operation, operande, resultatAttendu)` : Vérifie une solution.
+ * `nekident.trouverX(operation, operande, resultatAttendu)` : Trouve x pour une opération donnée.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Résoudre 2x + 5 = 15 (x = 5)
+console.log("Solution de 2x + 5 = 15 :", nekomaths.nekident.resoudreLineaire(2, 5, 15)); // Renvoie 5
+
+// Vérifier si x = 4 est solution de x + 3 = 7
+console.log("Vérification :", nekomaths.nekident.verifierSolution(4, 'add', 3, 7)); // Renvoie true
+
+// Trouver x pour x * 3 = 12
+console.log("x pour x * 3 = 12 :", nekomaths.nekident.trouverX('mult', 3, 12)); // Renvoie 4
+```
+
+### 14.2 Équations Complexes (nekaqua)
+ * `nekaqua.quadratique(a, b, c)` : Résout ax² + bx + c = 0.
+ * `nekaqua.systeme2x2(a1, b1, c1, a2, b2, c2)` : Résout un système 2x2.
+ * `nekaqua.evaluerPolynome(coefficients, x)` : Évalue un polynôme.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Résoudre x² - 5x + 6 = 0
+const equation = nekomaths.nekaqua.quadratique(1, -5, 6);
+console.log("Solutions quadratique :", equation); // x1 = 3, x2 = 2
+
+// Système d'équations 2x + 3y = 7, x - y = 1
+const systeme = nekomaths.nekaqua.systeme2x2(2, 3, 7, 1, -1, 1);
+console.log("Solution système :", systeme); // x = 2, y = 1
+
+// Évaluer P(x) = 2x² + 3x + 1 pour x = 2
+console.log("P(2) =", nekomaths.nekaqua.evaluerPolynome([2, 3, 1], 2)); // Renvoie 15
+```
+
+### 14.3 Calculs de Fractions (nekfrac)
+ * `nekfrac.simplifier(numerateur, denominateur)` : Simplifie une fraction.
+ * `nekfrac.additionner(num1, den1, num2, den2)` : Additionne deux fractions.
+ * `nekfrac.multiplier(num1, den1, num2, den2)` : Multiplie deux fractions.
+ * `nekfrac.pgcd(a, b)` : Calcule le PGCD.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Simplifier 12/18
+console.log("12/18 simplifié :", nekomaths.nekfrac.simplifier(12, 18)); // 2/3
+
+// Additionner 1/3 + 1/4
+const addition = nekomaths.nekfrac.additionner(1, 3, 1, 4);
+console.log("1/3 + 1/4 =", addition); // 7/12
+
+// Multiplier 2/3 * 3/4
+const multiplication = nekomaths.nekfrac.multiplier(2, 3, 3, 4);
+console.log("2/3 * 3/4 =", multiplication); // 1/2
+```
+
+### 14.4 Calculs avec Puissances (nektin)
+ * `nektin.resoudreCarree(a, b)` : Résout ax² = b.
+ * `nektin.resoudreCube(a, b)` : Résout ax³ = b.
+ * `nektin.fractionPuissance(num, den, exposant)` : Calcule (num/den)^exposant.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Résoudre 2x² = 8 (x = ±2)
+console.log("Solutions de 2x² = 8 :", nekomaths.nektin.resoudreCarree(2, 8));
+
+// Résoudre x³ = 27 (x = 3)
+console.log("Solution de x³ = 27 :", nekomaths.nektin.resoudreCube(1, 27));
+
+// Calculer (3/4)²
+console.log("(3/4)² =", nekomaths.nektin.fractionPuissance(3, 4, 2));
+```
+
+### 14.5 Nombre Alpha (nekalpha)
+ * `nekalpha.valeur` : Constante alpha de Feigenbaum.
+ * `nekalpha.serie(n)` : Calcule une série basée sur alpha.
+ * `nekalpha.transformation(x)` : Transformation alpha.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+console.log("Constante alpha :", nekomaths.nekalpha.valeur);
+console.log("Série alpha (10 termes) :", nekomaths.nekalpha.serie(10));
+console.log("Transformation alpha(0.5) :", nekomaths.nekalpha.transformation(0.5));
+```
+
+### 14.6 Nombre Beta (nekbeta)
+ * `nekbeta.fonction(a, b)` : Fonction beta d'Euler.
+ * `nekbeta.gamma(x)` : Approximation de la fonction gamma.
+ * `nekbeta.distribution(x, alpha, beta)` : Distribution beta.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+console.log("Beta(2, 3) :", nekomaths.nekbeta.fonction(2, 3));
+console.log("Gamma(4) :", nekomaths.nekbeta.gamma(4));
+console.log("Distribution beta :", nekomaths.nekbeta.distribution(0.5, 2, 3));
+```
+
+### 14.7 Nombre Omega (nekomega)
+ * `nekomega.spirale(t)` : Calcule la spirale d'or.
+ * `nekomega.fibonacciOmega(n)` : Fibonacci modifié avec omega.
+ * `nekomega.convergence(iterations)` : Calcul de convergence.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+console.log("Spirale omega :", nekomaths.nekomega.spirale(1));
+console.log("Fibonacci omega(10) :", nekomaths.nekomega.fibonacciOmega(10));
+console.log("Convergence omega :", nekomega.convergence(5));
+```
+
+### 14.8 Comparaison de Nombres (nekcopare)
+ * `nekcopare.comparer(a, b)` : Compare deux nombres.
+ * `nekcopare.maximum(nombres)` : Trouve le maximum dans un tableau.
+ * `nekcopare.minimum(nombres)` : Trouve le minimum dans un tableau.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Comparer 5 et 8
+const comparaison = nekomaths.nekcopare.comparer(5, 8);
+console.log("Comparaison :", comparaison); // 5 < 8
+
+// Trouver le maximum
+const nombres = [3, 7, 2, 9, 1];
+console.log("Maximum :", nekomaths.nekcopare.maximum(nombres)); // 9
+
+// Trouver le minimum
+console.log("Minimum :", nekomaths.nekcopare.minimum(nombres)); // 1
+```
+
+### 14.9 Base de Données Personnalisée (nekdone)
+ * `nekdone.creerBase(nom, structure)` : Crée une base de données.
+ * `nekdone.ajouterDonnee(nomBase, donnee)` : Ajoute des données.
+ * `nekdone.calculer(nomBase, propriete, operation)` : Effectue des calculs.
+ * `nekdone.obtenirBase(nomBase)` : Obtient les informations d'une base.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Créer une base de données
+nekomaths.nekdone.creerBase("ventes", ["produit", "prix", "quantite"]);
+
+// Ajouter des données
+nekomaths.nekdone.ajouterDonnee("ventes", {produit: "ordinateur", prix: 800, quantite: 2});
+nekomaths.nekdone.ajouterDonnee("ventes", {produit: "souris", prix: 25, quantite: 5});
+
+// Calculer la somme des prix
+const sommePrix = nekomaths.nekdone.calculer("ventes", "prix", "somme");
+console.log("Somme des prix :", sommePrix);
+
+// Obtenir toute la base
+const base = nekomaths.nekdone.obtenirBase("ventes");
+console.log("Base de données :", base);
+```
+
+### 14.10 Arithmétique Personnalisée (nekarin)
+ * `nekarin.enregistrerFonction(nom, fonction, description)` : Enregistre une fonction.
+ * `nekarin.executer(nom, ...args)` : Exécute une fonction personnalisée.
+ * `nekarin.combiner(nom1, nom2, operation, ...args)` : Combine deux fonctions.
+ * `nekarin.listerFonctions()` : Liste toutes les fonctions enregistrées.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Enregistrer une fonction personnalisée
+nekomaths.nekarin.enregistrerFonction("double", (x) => x * 2, "Multiplie par 2");
+nekomaths.nekarin.enregistrerFonction("carre", (x) => x * x, "Met au carré");
+
+// Exécuter les fonctions
+console.log("Double de 5 :", nekomaths.nekarin.executer("double", 5)); // 10
+console.log("Carré de 4 :", nekomaths.nekarin.executer("carre", 4)); // 16
+
+// Combiner les fonctions (double + carré pour x=3)
+const resultat = nekomaths.nekarin.combiner("double", "carre", "add", 3);
+console.log("Double(3) + Carré(3) =", resultat); // 6 + 9 = 15
+
+// Lister toutes les fonctions
+console.log("Fonctions enregistrées :", nekomaths.nekarin.listerFonctions());
+```
+
 **Contribution**
 
 Les contributions sont les bienvenues ! Si vous avez des idées de nouvelles fonctions, des améliorations ou des corrections de bugs, n'hésitez pas à ouvrir une issue ou à soumettre une pull request sur le dépôt GitHub.
