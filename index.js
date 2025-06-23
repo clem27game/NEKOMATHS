@@ -1927,6 +1927,1075 @@ const nekarin = {
     }
 };
 
+/**
+ * Fonctions pour tracer des graphiques de fonctions mathématiques.
+ */
+const nekgrap = {
+    /**
+     * Génère des points pour tracer une fonction.
+     * @param {Function} func - Fonction mathématique à tracer.
+     * @param {number} xMin - Valeur minimale de x.
+     * @param {number} xMax - Valeur maximale de x.
+     * @param {number} pas - Pas entre les valeurs de x.
+     * @returns {Array} Points de la fonction.
+     */
+    genererPoints: function(func, xMin = -10, xMax = 10, pas = 0.1) {
+        if (typeof func !== 'function') {
+            throw new Error('nekgrap.genererPoints: Le premier argument doit être une fonction.');
+        }
+        const points = [];
+        for (let x = xMin; x <= xMax; x += pas) {
+            try {
+                const y = func(x);
+                if (typeof y === 'number' && !isNaN(y) && isFinite(y)) {
+                    points.push({ x: x, y: y });
+                }
+            } catch (error) {
+                // Ignorer les erreurs de calcul pour certains points
+            }
+        }
+        return points;
+    },
+
+    /**
+     * Affiche un graphique simple dans la console.
+     * @param {Array} points - Points à afficher.
+     * @param {number} largeur - Largeur du graphique en caractères.
+     * @param {number} hauteur - Hauteur du graphique en caractères.
+     * @returns {string} Représentation ASCII du graphique.
+     */
+    afficherConsole: function(points, largeur = 80, hauteur = 20) {
+        if (!Array.isArray(points) || points.length === 0) {
+            throw new Error('nekgrap.afficherConsole: Points invalides.');
+        }
+
+        const xValues = points.map(p => p.x);
+        const yValues = points.map(p => p.y);
+        const xMin = Math.min(...xValues);
+        const xMax = Math.max(...xValues);
+        const yMin = Math.min(...yValues);
+        const yMax = Math.max(...yValues);
+
+        let graphique = '';
+        for (let row = 0; row < hauteur; row++) {
+            let ligne = '';
+            for (let col = 0; col < largeur; col++) {
+                const x = xMin + (col / (largeur - 1)) * (xMax - xMin);
+                const y = yMax - (row / (hauteur - 1)) * (yMax - yMin);
+                
+                // Trouver le point le plus proche
+                const pointProche = points.reduce((prev, curr) => {
+                    const distPrev = Math.abs(prev.x - x) + Math.abs(prev.y - y);
+                    const distCurr = Math.abs(curr.x - x) + Math.abs(curr.y - y);
+                    return distCurr < distPrev ? curr : prev;
+                });
+
+                if (Math.abs(pointProche.x - x) < (xMax - xMin) / largeur && 
+                    Math.abs(pointProche.y - y) < (yMax - yMin) / hauteur) {
+                    ligne += '*';
+                } else if (Math.abs(y) < (yMax - yMin) / hauteur) {
+                    ligne += '-'; // Axe X
+                } else if (Math.abs(x) < (xMax - xMin) / largeur) {
+                    ligne += '|'; // Axe Y
+                } else {
+                    ligne += ' ';
+                }
+            }
+            graphique += ligne + '\n';
+        }
+        return graphique;
+    },
+
+    /**
+     * Trace et affiche une fonction directement.
+     * @param {Function} func - Fonction à tracer.
+     * @param {Object} options - Options de tracé.
+     */
+    tracer: function(func, options = {}) {
+        const opts = {
+            xMin: -10,
+            xMax: 10,
+            pas: 0.1,
+            largeur: 80,
+            hauteur: 20,
+            ...options
+        };
+        
+        const points = this.genererPoints(func, opts.xMin, opts.xMax, opts.pas);
+        const graphique = this.afficherConsole(points, opts.largeur, opts.hauteur);
+        console.log(graphique);
+        return points;
+    }
+};
+
+/**
+ * Calculateur de progressions arithmétiques et géométriques.
+ */
+const nekoser = {
+    /**
+     * Calcule les termes d'une progression arithmétique.
+     * @param {number} premier - Premier terme.
+     * @param {number} raison - Raison de la progression.
+     * @param {number} n - Nombre de termes.
+     * @returns {Array} Termes de la progression.
+     */
+    arithmetique: function(premier, raison, n) {
+        if (typeof premier !== 'number' || typeof raison !== 'number' || 
+            typeof n !== 'number' || !Number.isInteger(n) || n <= 0) {
+            throw new Error('nekoser.arithmetique: Arguments invalides.');
+        }
+        
+        const termes = [];
+        for (let i = 0; i < n; i++) {
+            termes.push(premier + i * raison);
+        }
+        
+        return {
+            termes: termes,
+            somme: n * (2 * premier + (n - 1) * raison) / 2,
+            type: 'arithmetique',
+            premier: premier,
+            raison: raison,
+            nombreTermes: n
+        };
+    },
+
+    /**
+     * Calcule les termes d'une progression géométrique.
+     * @param {number} premier - Premier terme.
+     * @param {number} raison - Raison de la progression.
+     * @param {number} n - Nombre de termes.
+     * @returns {Array} Termes de la progression.
+     */
+    geometrique: function(premier, raison, n) {
+        if (typeof premier !== 'number' || typeof raison !== 'number' || 
+            typeof n !== 'number' || !Number.isInteger(n) || n <= 0) {
+            throw new Error('nekoser.geometrique: Arguments invalides.');
+        }
+        
+        const termes = [];
+        for (let i = 0; i < n; i++) {
+            termes.push(premier * Math.pow(raison, i));
+        }
+        
+        let somme;
+        if (raison === 1) {
+            somme = n * premier;
+        } else {
+            somme = premier * (1 - Math.pow(raison, n)) / (1 - raison);
+        }
+        
+        return {
+            termes: termes,
+            somme: somme,
+            type: 'geometrique',
+            premier: premier,
+            raison: raison,
+            nombreTermes: n
+        };
+    }
+};
+
+/**
+ * Calculateur de séries infinies.
+ */
+const neka = {
+    /**
+     * Calcule la somme d'une série géométrique infinie.
+     * @param {number} premier - Premier terme.
+     * @param {number} raison - Raison (doit être |r| < 1).
+     * @returns {number} Somme de la série infinie.
+     */
+    serieGeometriqueInfinie: function(premier, raison) {
+        if (typeof premier !== 'number' || typeof raison !== 'number') {
+            throw new Error('neka.serieGeometriqueInfinie: Arguments invalides.');
+        }
+        if (Math.abs(raison) >= 1) {
+            throw new Error('neka.serieGeometriqueInfinie: |raison| doit être < 1 pour la convergence.');
+        }
+        
+        return premier / (1 - raison);
+    },
+
+    /**
+     * Approxime la somme d'une série en calculant n termes.
+     * @param {Function} termFunction - Fonction qui retourne le n-ième terme.
+     * @param {number} maxTermes - Nombre maximum de termes à calculer.
+     * @param {number} precision - Précision souhaitée.
+     * @returns {Object} Résultat de l'approximation.
+     */
+    approximerSerie: function(termFunction, maxTermes = 1000, precision = 1e-10) {
+        if (typeof termFunction !== 'function') {
+            throw new Error('neka.approximerSerie: Le premier argument doit être une fonction.');
+        }
+        
+        let somme = 0;
+        let termePrecedent = 0;
+        
+        for (let n = 1; n <= maxTermes; n++) {
+            const terme = termFunction(n);
+            somme += terme;
+            
+            if (Math.abs(terme - termePrecedent) < precision) {
+                return {
+                    somme: somme,
+                    nombreTermes: n,
+                    converge: true,
+                    precision: Math.abs(terme - termePrecedent)
+                };
+            }
+            termePrecedent = terme;
+        }
+        
+        return {
+            somme: somme,
+            nombreTermes: maxTermes,
+            converge: false,
+            precision: Math.abs(termFunction(maxTermes))
+        };
+    }
+};
+
+/**
+ * Calculateur de matrices avec inversions.
+ */
+const nekoma = {
+    /**
+     * Crée une matrice à partir d'un tableau 2D.
+     * @param {Array} donnees - Tableau 2D représentant la matrice.
+     * @returns {Object} Objet matrice.
+     */
+    creer: function(donnees) {
+        if (!Array.isArray(donnees) || donnees.length === 0) {
+            throw new Error('nekoma.creer: Données invalides.');
+        }
+        
+        const lignes = donnees.length;
+        const colonnes = donnees[0].length;
+        
+        // Vérifier que toutes les lignes ont la même longueur
+        for (let ligne of donnees) {
+            if (!Array.isArray(ligne) || ligne.length !== colonnes) {
+                throw new Error('nekoma.creer: Toutes les lignes doivent avoir la même longueur.');
+            }
+        }
+        
+        return {
+            donnees: donnees,
+            lignes: lignes,
+            colonnes: colonnes,
+            type: 'matrice'
+        };
+    },
+
+    /**
+     * Calcule l'inverse d'une matrice 2x2.
+     * @param {Object} matrice - Matrice à inverser.
+     * @returns {Object} Matrice inverse.
+     */
+    inverser2x2: function(matrice) {
+        if (!matrice || matrice.lignes !== 2 || matrice.colonnes !== 2) {
+            throw new Error('nekoma.inverser2x2: Matrice 2x2 requise.');
+        }
+        
+        const [[a, b], [c, d]] = matrice.donnees;
+        const det = a * d - b * c;
+        
+        if (Math.abs(det) < 1e-10) {
+            throw new Error('nekoma.inverser2x2: Matrice non inversible (déterminant = 0).');
+        }
+        
+        const inverse = [
+            [d / det, -b / det],
+            [-c / det, a / det]
+        ];
+        
+        return this.creer(inverse);
+    },
+
+    /**
+     * Multiplie deux matrices.
+     * @param {Object} matrice1 - Première matrice.
+     * @param {Object} matrice2 - Deuxième matrice.
+     * @returns {Object} Produit des matrices.
+     */
+    multiplier: function(matrice1, matrice2) {
+        if (matrice1.colonnes !== matrice2.lignes) {
+            throw new Error('nekoma.multiplier: Dimensions incompatibles.');
+        }
+        
+        const resultat = [];
+        for (let i = 0; i < matrice1.lignes; i++) {
+            resultat[i] = [];
+            for (let j = 0; j < matrice2.colonnes; j++) {
+                let somme = 0;
+                for (let k = 0; k < matrice1.colonnes; k++) {
+                    somme += matrice1.donnees[i][k] * matrice2.donnees[k][j];
+                }
+                resultat[i][j] = somme;
+            }
+        }
+        
+        return this.creer(resultat);
+    }
+};
+
+/**
+ * Calculateur de déterminants de matrices.
+ */
+const nekyu = {
+    /**
+     * Calcule le déterminant d'une matrice 2x2.
+     * @param {Object} matrice - Matrice 2x2.
+     * @returns {number} Déterminant.
+     */
+    determinant2x2: function(matrice) {
+        if (!matrice || matrice.lignes !== 2 || matrice.colonnes !== 2) {
+            throw new Error('nekyu.determinant2x2: Matrice 2x2 requise.');
+        }
+        
+        const [[a, b], [c, d]] = matrice.donnees;
+        return a * d - b * c;
+    },
+
+    /**
+     * Calcule le déterminant d'une matrice 3x3.
+     * @param {Object} matrice - Matrice 3x3.
+     * @returns {number} Déterminant.
+     */
+    determinant3x3: function(matrice) {
+        if (!matrice || matrice.lignes !== 3 || matrice.colonnes !== 3) {
+            throw new Error('nekyu.determinant3x3: Matrice 3x3 requise.');
+        }
+        
+        const m = matrice.donnees;
+        return m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
+               m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
+               m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+    },
+
+    /**
+     * Crée une matrice identité.
+     * @param {number} taille - Taille de la matrice.
+     * @returns {Object} Matrice identité.
+     */
+    identite: function(taille) {
+        if (typeof taille !== 'number' || !Number.isInteger(taille) || taille <= 0) {
+            throw new Error('nekyu.identite: Taille invalide.');
+        }
+        
+        const matrice = [];
+        for (let i = 0; i < taille; i++) {
+            matrice[i] = [];
+            for (let j = 0; j < taille; j++) {
+                matrice[i][j] = (i === j) ? 1 : 0;
+            }
+        }
+        
+        return nekoma.creer(matrice);
+    }
+};
+
+/**
+ * Méthode de Newton-Raphson pour la recherche de racines.
+ */
+const nekonew = {
+    /**
+     * Trouve une racine en utilisant la méthode de Newton-Raphson.
+     * @param {Function} func - Fonction f(x).
+     * @param {Function} derivee - Dérivée f'(x).
+     * @param {number} x0 - Point de départ.
+     * @param {number} tolerance - Tolérance pour la convergence.
+     * @param {number} maxIterations - Nombre maximum d'itérations.
+     * @returns {Object} Résultat de la recherche.
+     */
+    trouverRacine: function(func, derivee, x0, tolerance = 1e-10, maxIterations = 100) {
+        if (typeof func !== 'function' || typeof derivee !== 'function') {
+            throw new Error('nekonew.trouverRacine: Les deux premiers arguments doivent être des fonctions.');
+        }
+        
+        let x = x0;
+        const iterations = [];
+        
+        for (let i = 0; i < maxIterations; i++) {
+            const fx = func(x);
+            const fpx = derivee(x);
+            
+            if (Math.abs(fpx) < 1e-15) {
+                throw new Error('nekonew.trouverRacine: Dérivée trop proche de zéro.');
+            }
+            
+            const nouveauX = x - fx / fpx;
+            
+            iterations.push({
+                iteration: i + 1,
+                x: x,
+                fx: fx,
+                fpx: fpx,
+                nouveauX: nouveauX
+            });
+            
+            if (Math.abs(nouveauX - x) < tolerance) {
+                return {
+                    racine: nouveauX,
+                    iterations: iterations,
+                    converge: true,
+                    precision: Math.abs(nouveauX - x)
+                };
+            }
+            
+            x = nouveauX;
+        }
+        
+        return {
+            racine: x,
+            iterations: iterations,
+            converge: false,
+            precision: Math.abs(func(x))
+        };
+    }
+};
+
+/**
+ * Méthode de Monte Carlo pour simulations.
+ */
+const nekcarlo = {
+    /**
+     * Estime π en utilisant Monte Carlo.
+     * @param {number} nombrePoints - Nombre de points à générer.
+     * @returns {Object} Estimation de π.
+     */
+    estimerPi: function(nombrePoints = 1000000) {
+        let pointsDansCercle = 0;
+        
+        for (let i = 0; i < nombrePoints; i++) {
+            const x = Math.random() * 2 - 1; // Entre -1 et 1
+            const y = Math.random() * 2 - 1; // Entre -1 et 1
+            
+            if (x * x + y * y <= 1) {
+                pointsDansCercle++;
+            }
+        }
+        
+        const estimation = 4 * pointsDansCercle / nombrePoints;
+        
+        return {
+            estimation: estimation,
+            erreur: Math.abs(estimation - Math.PI),
+            nombrePoints: nombrePoints,
+            pointsDansCercle: pointsDansCercle
+        };
+    },
+
+    /**
+     * Simule une intégrale en utilisant Monte Carlo.
+     * @param {Function} func - Fonction à intégrer.
+     * @param {number} a - Borne inférieure.
+     * @param {number} b - Borne supérieure.
+     * @param {number} nombrePoints - Nombre de points.
+     * @returns {Object} Estimation de l'intégrale.
+     */
+    integrer: function(func, a, b, nombrePoints = 100000) {
+        if (typeof func !== 'function') {
+            throw new Error('nekcarlo.integrer: Premier argument doit être une fonction.');
+        }
+        
+        let somme = 0;
+        
+        for (let i = 0; i < nombrePoints; i++) {
+            const x = a + Math.random() * (b - a);
+            somme += func(x);
+        }
+        
+        const estimation = (b - a) * somme / nombrePoints;
+        
+        return {
+            estimation: estimation,
+            intervalle: [a, b],
+            nombrePoints: nombrePoints
+        };
+    }
+};
+
+/**
+ * Interface interactive pour la console.
+ */
+const nekinterac = {
+    /**
+     * Crée un menu interactif.
+     * @param {Object} options - Options du menu.
+     * @returns {string} Menu formaté.
+     */
+    creerMenu: function(options) {
+        const titre = options.titre || 'Menu Nekomaths';
+        const choix = options.choix || [];
+        
+        let menu = `\n=== ${titre} ===\n`;
+        
+        choix.forEach((choice, index) => {
+            menu += `${index + 1}. ${choice.nom}\n`;
+        });
+        
+        menu += '0. Quitter\n';
+        menu += 'Votre choix: ';
+        
+        return menu;
+    },
+
+    /**
+     * Affiche un calculateur interactif.
+     * @param {string} operation - Type d'opération.
+     * @returns {string} Interface de calculateur.
+     */
+    calculateur: function(operation = 'addition') {
+        const operations = {
+            addition: { symbole: '+', nom: 'Addition' },
+            soustraction: { symbole: '-', nom: 'Soustraction' },
+            multiplication: { symbole: '*', nom: 'Multiplication' },
+            division: { symbole: '/', nom: 'Division' }
+        };
+        
+        const op = operations[operation];
+        if (!op) {
+            throw new Error('nekinterac.calculateur: Opération non supportée.');
+        }
+        
+        return `\n=== Calculateur ${op.nom} ===\n` +
+               `Entrez deux nombres pour effectuer: a ${op.symbole} b\n` +
+               `Tapez 'menu' pour revenir au menu principal\n`;
+    }
+};
+
+/**
+ * Convertisseur d'unités avancé.
+ */
+const nekconvert = {
+    /**
+     * Tables de conversion.
+     */
+    conversions: {
+        longueur: {
+            metre: 1,
+            kilometre: 0.001,
+            centimetre: 100,
+            millimetre: 1000,
+            pouce: 39.3701,
+            pied: 3.28084,
+            yard: 1.09361,
+            mile: 0.000621371
+        },
+        poids: {
+            kilogramme: 1,
+            gramme: 1000,
+            tonne: 0.001,
+            livre: 2.20462,
+            once: 35.274
+        },
+        temperature: {
+            celsius: { offset: 0, factor: 1 },
+            fahrenheit: { offset: 32, factor: 9/5 },
+            kelvin: { offset: 273.15, factor: 1 }
+        }
+    },
+
+    /**
+     * Convertit une valeur d'une unité à une autre.
+     * @param {number} valeur - Valeur à convertir.
+     * @param {string} uniteSource - Unité source.
+     * @param {string} uniteCible - Unité cible.
+     * @param {string} type - Type de conversion.
+     * @returns {number} Valeur convertie.
+     */
+    convertir: function(valeur, uniteSource, uniteCible, type = 'longueur') {
+        if (typeof valeur !== 'number') {
+            throw new Error('nekconvert.convertir: La valeur doit être un nombre.');
+        }
+        
+        const table = this.conversions[type];
+        if (!table) {
+            throw new Error('nekconvert.convertir: Type de conversion non supporté.');
+        }
+        
+        if (type === 'temperature') {
+            return this.convertirTemperature(valeur, uniteSource, uniteCible);
+        }
+        
+        const facteurSource = table[uniteSource];
+        const facteurCible = table[uniteCible];
+        
+        if (!facteurSource || !facteurCible) {
+            throw new Error('nekconvert.convertir: Unité non supportée.');
+        }
+        
+        // Convertir vers l'unité de base puis vers l'unité cible
+        const valeurBase = valeur / facteurSource;
+        return valeurBase * facteurCible;
+    },
+
+    /**
+     * Convertit les températures.
+     * @param {number} valeur - Température à convertir.
+     * @param {string} uniteSource - Unité source.
+     * @param {string} uniteCible - Unité cible.
+     * @returns {number} Température convertie.
+     */
+    convertirTemperature: function(valeur, uniteSource, uniteCible) {
+        // Convertir vers Celsius d'abord
+        let celsius = valeur;
+        if (uniteSource === 'fahrenheit') {
+            celsius = (valeur - 32) * 5/9;
+        } else if (uniteSource === 'kelvin') {
+            celsius = valeur - 273.15;
+        }
+        
+        // Convertir depuis Celsius vers la cible
+        if (uniteCible === 'fahrenheit') {
+            return celsius * 9/5 + 32;
+        } else if (uniteCible === 'kelvin') {
+            return celsius + 273.15;
+        }
+        
+        return celsius;
+    }
+};
+
+/**
+ * Historique des calculs.
+ */
+const nekohis = {
+    /**
+     * Stockage de l'historique.
+     */
+    historique: [],
+
+    /**
+     * Ajoute un calcul à l'historique.
+     * @param {string} operation - Description de l'opération.
+     * @param {*} resultat - Résultat du calcul.
+     * @param {Array} parametres - Paramètres utilisés.
+     * @returns {Object} Entrée d'historique.
+     */
+    ajouter: function(operation, resultat, parametres = []) {
+        const entree = {
+            id: this.historique.length + 1,
+            operation: operation,
+            resultat: resultat,
+            parametres: parametres,
+            timestamp: new Date(),
+            date: new Date().toLocaleString()
+        };
+        
+        this.historique.push(entree);
+        return entree;
+    },
+
+    /**
+     * Récupère l'historique complet.
+     * @returns {Array} Historique des calculs.
+     */
+    obtenirHistorique: function() {
+        return this.historique;
+    },
+
+    /**
+     * Récupère un calcul par ID.
+     * @param {number} id - ID du calcul.
+     * @returns {Object} Calcul trouvé.
+     */
+    obtenirParId: function(id) {
+        return this.historique.find(entree => entree.id === id);
+    },
+
+    /**
+     * Efface l'historique.
+     */
+    effacer: function() {
+        this.historique = [];
+    },
+
+    /**
+     * Réutilise un calcul précédent.
+     * @param {number} id - ID du calcul à réutiliser.
+     * @returns {*} Résultat du calcul.
+     */
+    reutiliser: function(id) {
+        const calcul = this.obtenirParId(id);
+        if (!calcul) {
+            throw new Error('nekohis.reutiliser: Calcul non trouvé.');
+        }
+        return calcul.resultat;
+    }
+};
+
+/**
+ * Algorithmes d'optimisation.
+ */
+const nekalgo = {
+    /**
+     * Trouve le minimum d'une fonction en utilisant la descente de gradient.
+     * @param {Function} func - Fonction à minimiser.
+     * @param {Function} gradient - Gradient de la fonction.
+     * @param {number} x0 - Point de départ.
+     * @param {number} tauxApprentissage - Taux d'apprentissage.
+     * @param {number} maxIterations - Nombre maximum d'itérations.
+     * @returns {Object} Résultat de l'optimisation.
+     */
+    descenteGradient: function(func, gradient, x0, tauxApprentissage = 0.01, maxIterations = 1000) {
+        if (typeof func !== 'function' || typeof gradient !== 'function') {
+            throw new Error('nekalgo.descenteGradient: Fonction et gradient requis.');
+        }
+        
+        let x = x0;
+        const historique = [];
+        
+        for (let i = 0; i < maxIterations; i++) {
+            const grad = gradient(x);
+            const nouveauX = x - tauxApprentissage * grad;
+            
+            historique.push({
+                iteration: i + 1,
+                x: x,
+                fx: func(x),
+                gradient: grad
+            });
+            
+            if (Math.abs(nouveauX - x) < 1e-8) {
+                return {
+                    minimum: nouveauX,
+                    valeurMinimum: func(nouveauX),
+                    iterations: historique,
+                    converge: true
+                };
+            }
+            
+            x = nouveauX;
+        }
+        
+        return {
+            minimum: x,
+            valeurMinimum: func(x),
+            iterations: historique,
+            converge: false
+        };
+    },
+
+    /**
+     * Recherche par force brute dans un intervalle.
+     * @param {Function} func - Fonction à optimiser.
+     * @param {number} a - Borne inférieure.
+     * @param {number} b - Borne supérieure.
+     * @param {number} pas - Pas de recherche.
+     * @returns {Object} Résultat de l'optimisation.
+     */
+    rechercheBruteForce: function(func, a, b, pas = 0.01) {
+        let xOptimal = a;
+        let valeurOptimale = func(a);
+        
+        for (let x = a; x <= b; x += pas) {
+            const valeur = func(x);
+            if (valeur < valeurOptimale) {
+                valeurOptimale = valeur;
+                xOptimal = x;
+            }
+        }
+        
+        return {
+            minimum: xOptimal,
+            valeurMinimum: valeurOptimale,
+            intervalle: [a, b],
+            pas: pas
+        };
+    }
+};
+
+/**
+ * Créateur d'algorithmes personnalisés.
+ */
+const nekeit = {
+    /**
+     * Stockage des algorithmes.
+     */
+    algorithmes: new Map(),
+
+    /**
+     * Crée un nouvel algorithme.
+     * @param {string} nom - Nom de l'algorithme.
+     * @param {Function} algorithme - Fonction de l'algorithme.
+     * @param {string} description - Description.
+     * @returns {boolean} Succès de la création.
+     */
+    creer: function(nom, algorithme, description = '') {
+        if (typeof nom !== 'string' || typeof algorithme !== 'function') {
+            throw new Error('nekeit.creer: Nom et algorithme requis.');
+        }
+        
+        this.algorithmes.set(nom, {
+            algorithme: algorithme,
+            description: description,
+            creeLe: new Date(),
+            executions: 0
+        });
+        
+        return true;
+    },
+
+    /**
+     * Exécute un algorithme.
+     * @param {string} nom - Nom de l'algorithme.
+     * @param {...*} args - Arguments.
+     * @returns {*} Résultat de l'algorithme.
+     */
+    executer: function(nom, ...args) {
+        const algo = this.algorithmes.get(nom);
+        if (!algo) {
+            throw new Error('nekeit.executer: Algorithme non trouvé.');
+        }
+        
+        algo.executions++;
+        try {
+            return algo.algorithme.apply(null, args);
+        } catch (error) {
+            throw new Error(`nekeit.executer: Erreur dans ${nom}: ${error.message}`);
+        }
+    },
+
+    /**
+     * Liste tous les algorithmes.
+     * @returns {Array} Liste des algorithmes.
+     */
+    lister: function() {
+        return Array.from(this.algorithmes.entries()).map(([nom, info]) => ({
+            nom: nom,
+            description: info.description,
+            executions: info.executions,
+            creeLe: info.creeLe
+        }));
+    }
+};
+
+/**
+ * Calculateur de coûts de distribution.
+ */
+const neksrar = {
+    /**
+     * Calcule le coût de transport.
+     * @param {number} distance - Distance en km.
+     * @param {number} coutParKm - Coût par kilomètre.
+     * @param {number} poids - Poids en kg.
+     * @returns {Object} Détail des coûts.
+     */
+    coutTransport: function(distance, coutParKm, poids = 1) {
+        if (typeof distance !== 'number' || typeof coutParKm !== 'number' || 
+            distance < 0 || coutParKm < 0) {
+            throw new Error('neksrar.coutTransport: Paramètres invalides.');
+        }
+        
+        const coutBase = distance * coutParKm;
+        const coutPoids = poids > 10 ? (poids - 10) * 0.1 * coutBase : 0;
+        const coutTotal = coutBase + coutPoids;
+        
+        return {
+            distance: distance,
+            coutParKm: coutParKm,
+            poids: poids,
+            coutBase: coutBase,
+            coutPoids: coutPoids,
+            coutTotal: coutTotal
+        };
+    },
+
+    /**
+     * Calcule le coût de stockage.
+     * @param {number} volume - Volume en m³.
+     * @param {number} duree - Durée en jours.
+     * @param {number} coutParM3Jour - Coût par m³ par jour.
+     * @returns {Object} Coût de stockage.
+     */
+    coutStockage: function(volume, duree, coutParM3Jour) {
+        const coutTotal = volume * duree * coutParM3Jour;
+        
+        return {
+            volume: volume,
+            duree: duree,
+            coutParM3Jour: coutParM3Jour,
+            coutTotal: coutTotal
+        };
+    }
+};
+
+/**
+ * Calculateur financier d'entreprise.
+ */
+const nekgef = {
+    /**
+     * Calcule le Besoin en Fonds de Roulement (BFR).
+     * @param {number} stocks - Valeur des stocks.
+     * @param {number} creancesClients - Créances clients.
+     * @param {number} dettesFournisseurs - Dettes fournisseurs.
+     * @returns {Object} Calcul du BFR.
+     */
+    calculerBFR: function(stocks, creancesClients, dettesFournisseurs) {
+        const bfr = stocks + creancesClients - dettesFournisseurs;
+        
+        return {
+            stocks: stocks,
+            creancesClients: creancesClients,
+            dettesFournisseurs: dettesFournisseurs,
+            bfr: bfr,
+            interpretation: bfr > 0 ? 'Besoin de financement' : 'Excédent de financement'
+        };
+    },
+
+    /**
+     * Calcule le Fonds de Roulement Net Global (FRNG).
+     * @param {number} capitauxPermanents - Capitaux permanents.
+     * @param {number} immobilisations - Immobilisations nettes.
+     * @returns {Object} Calcul du FRNG.
+     */
+    calculerFRNG: function(capitauxPermanents, immobilisations) {
+        const frng = capitauxPermanents - immobilisations;
+        
+        return {
+            capitauxPermanents: capitauxPermanents,
+            immobilisations: immobilisations,
+            frng: frng,
+            interpretation: frng > 0 ? 'Équilibre financier' : 'Déséquilibre financier'
+        };
+    },
+
+    /**
+     * Calcule la Trésorerie Nette.
+     * @param {number} frng - Fonds de roulement net global.
+     * @param {number} bfr - Besoin en fonds de roulement.
+     * @returns {Object} Trésorerie nette.
+     */
+    calculerTresorerieNette: function(frng, bfr) {
+        const tresorerieNette = frng - bfr;
+        
+        return {
+            frng: frng,
+            bfr: bfr,
+            tresorerieNette: tresorerieNette,
+            interpretation: tresorerieNette > 0 ? 'Trésorerie positive' : 'Trésorerie négative'
+        };
+    }
+};
+
+/**
+ * Calculateur d'immobilisations.
+ */
+const nekpo = {
+    /**
+     * Calcule l'amortissement linéaire.
+     * @param {number} valeurInitiale - Valeur d'acquisition.
+     * @param {number} dureeVie - Durée de vie en années.
+     * @param {number} valeurResiduelle - Valeur résiduelle.
+     * @returns {Object} Plan d'amortissement.
+     */
+    amortissementLineaire: function(valeurInitiale, dureeVie, valeurResiduelle = 0) {
+        const baseAmortissable = valeurInitiale - valeurResiduelle;
+        const annuiteAmortissement = baseAmortissable / dureeVie;
+        
+        const plan = [];
+        let valeurComptable = valeurInitiale;
+        
+        for (let annee = 1; annee <= dureeVie; annee++) {
+            valeurComptable -= annuiteAmortissement;
+            plan.push({
+                annee: annee,
+                annuiteAmortissement: annuiteAmortissement,
+                valeurComptable: Math.max(valeurComptable, valeurResiduelle)
+            });
+        }
+        
+        return {
+            valeurInitiale: valeurInitiale,
+            dureeVie: dureeVie,
+            valeurResiduelle: valeurResiduelle,
+            annuiteAmortissement: annuiteAmortissement,
+            plan: plan
+        };
+    },
+
+    /**
+     * Calcule la plus ou moins-value de cession.
+     * @param {number} prixCession - Prix de cession.
+     * @param {number} valeurComptable - Valeur comptable nette.
+     * @returns {Object} Plus ou moins-value.
+     */
+    plusMoinsValue: function(prixCession, valeurComptable) {
+        const plusMoinsValue = prixCession - valeurComptable;
+        
+        return {
+            prixCession: prixCession,
+            valeurComptable: valeurComptable,
+            plusMoinsValue: plusMoinsValue,
+            type: plusMoinsValue > 0 ? 'Plus-value' : 'Moins-value'
+        };
+    }
+};
+
+/**
+ * Calculateur de TVA et inflation.
+ */
+const nekia = {
+    /**
+     * Calcule la TVA.
+     * @param {number} montantHT - Montant hors taxes.
+     * @param {number} tauxTVA - Taux de TVA en pourcentage.
+     * @returns {Object} Calcul de la TVA.
+     */
+    calculerTVA: function(montantHT, tauxTVA = 20) {
+        const montantTVA = montantHT * tauxTVA / 100;
+        const montantTTC = montantHT + montantTVA;
+        
+        return {
+            montantHT: montantHT,
+            tauxTVA: tauxTVA,
+            montantTVA: montantTVA,
+            montantTTC: montantTTC
+        };
+    },
+
+    /**
+     * Calcule le montant hors taxes à partir du TTC.
+     * @param {number} montantTTC - Montant toutes taxes comprises.
+     * @param {number} tauxTVA - Taux de TVA en pourcentage.
+     * @returns {Object} Calcul inverse.
+     */
+    calculerHT: function(montantTTC, tauxTVA = 20) {
+        const montantHT = montantTTC / (1 + tauxTVA / 100);
+        const montantTVA = montantTTC - montantHT;
+        
+        return {
+            montantTTC: montantTTC,
+            tauxTVA: tauxTVA,
+            montantHT: montantHT,
+            montantTVA: montantTVA
+        };
+    },
+
+    /**
+     * Calcule l'inflation.
+     * @param {number} valeurInitiale - Valeur initiale.
+     * @param {number} valeurFinale - Valeur finale.
+     * @param {number} annees - Nombre d'années.
+     * @returns {Object} Taux d'inflation.
+     */
+    calculerInflation: function(valeurInitiale, valeurFinale, annees = 1) {
+        const tauxInflation = Math.pow(valeurFinale / valeurInitiale, 1 / annees) - 1;
+        const tauxPourcentage = tauxInflation * 100;
+        
+        return {
+            valeurInitiale: valeurInitiale,
+            valeurFinale: valeurFinale,
+            annees: annees,
+            tauxInflation: tauxInflation,
+            tauxPourcentage: tauxPourcentage
+        };
+    }
+};
+
 // Exportation de toutes les fonctions pour qu'elles soient utilisables par d'autres modules.
 module.exports = {
     nekadd,
@@ -1974,5 +3043,22 @@ module.exports = {
     nekomega,
     nekcopare,
     nekdone,
-    nekarin
+    nekarin,
+    // Nouvelles fonctionnalités v1.5.0
+    nekgrap,
+    nekoser,
+    neka,
+    nekoma,
+    nekyu,
+    nekonew,
+    nekcarlo,
+    nekinterac,
+    nekconvert,
+    nekohis,
+    nekalgo,
+    nekeit,
+    neksrar,
+    nekgef,
+    nekpo,
+    nekia
 };

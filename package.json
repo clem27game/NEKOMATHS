@@ -1,6 +1,6 @@
 {
   "name": "nekomaths",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Un package utilitaire mathématique simple et convivial par Nekoclem",
   "main": "index.js",
   "scripts": {

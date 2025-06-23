@@ -593,6 +593,329 @@ console.log("Double(3) + Carré(3) =", resultat); // 6 + 9 = 15
 console.log("Fonctions enregistrées :", nekomaths.nekarin.listerFonctions());
 ```
 
+## 15. Nouvelles Fonctionnalités v1.5.0
+
+### 15.1 Tracé de Graphiques (nekgrap)
+ * `nekgrap.genererPoints(func, xMin, xMax, pas)` : Génère des points pour tracer une fonction.
+ * `nekgrap.afficherConsole(points, largeur, hauteur)` : Affiche un graphique ASCII dans la console.
+ * `nekgrap.tracer(func, options)` : Trace et affiche une fonction directement.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Tracer une fonction quadratique
+const points = nekomaths.nekgrap.tracer(x => x * x, {
+    xMin: -5,
+    xMax: 5,
+    pas: 0.1,
+    largeur: 60,
+    hauteur: 15
+});
+
+// Tracer une fonction sinus
+nekomaths.nekgrap.tracer(Math.sin, { xMin: -Math.PI, xMax: Math.PI });
+```
+
+### 15.2 Progressions et Séries (nekoser)
+ * `nekoser.arithmetique(premier, raison, n)` : Calcule une progression arithmétique.
+ * `nekoser.geometrique(premier, raison, n)` : Calcule une progression géométrique.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Progression arithmétique : 2, 5, 8, 11, 14
+const arith = nekomaths.nekoser.arithmetique(2, 3, 5);
+console.log("Termes :", arith.termes); // [2, 5, 8, 11, 14]
+console.log("Somme :", arith.somme); // 40
+
+// Progression géométrique : 1, 2, 4, 8, 16
+const geom = nekomaths.nekoser.geometrique(1, 2, 5);
+console.log("Termes :", geom.termes); // [1, 2, 4, 8, 16]
+console.log("Somme :", geom.somme); // 31
+```
+
+### 15.3 Séries Infinies (neka)
+ * `neka.serieGeometriqueInfinie(premier, raison)` : Calcule la somme d'une série géométrique infinie.
+ * `neka.approximerSerie(termFunction, maxTermes, precision)` : Approxime une série par calcul de termes.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Série géométrique infinie 1 + 1/2 + 1/4 + 1/8 + ... = 2
+const sommeInfinie = nekomaths.neka.serieGeometriqueInfinie(1, 0.5);
+console.log("Somme infinie :", sommeInfinie); // 2
+
+// Approximer la série harmonique
+const harmonique = nekomaths.neka.approximerSerie(n => 1/n, 1000);
+console.log("Approximation :", harmonique);
+```
+
+### 15.4 Matrices et Inversions (nekoma)
+ * `nekoma.creer(donnees)` : Crée une matrice à partir d'un tableau 2D.
+ * `nekoma.inverser2x2(matrice)` : Calcule l'inverse d'une matrice 2x2.
+ * `nekoma.multiplier(matrice1, matrice2)` : Multiplie deux matrices.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Créer et inverser une matrice 2x2
+const matrice = nekomaths.nekoma.creer([[2, 1], [1, 1]]);
+const inverse = nekomaths.nekoma.inverser2x2(matrice);
+console.log("Matrice inverse :", inverse.donnees);
+
+// Multiplication de matrices
+const produit = nekomaths.nekoma.multiplier(matrice, inverse);
+console.log("Produit (devrait être identité) :", produit.donnees);
+```
+
+### 15.5 Déterminants (nekyu)
+ * `nekyu.determinant2x2(matrice)` : Calcule le déterminant d'une matrice 2x2.
+ * `nekyu.determinant3x3(matrice)` : Calcule le déterminant d'une matrice 3x3.
+ * `nekyu.identite(taille)` : Crée une matrice identité.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Déterminant 2x2
+const matrice2x2 = nekomaths.nekoma.creer([[3, 2], [1, 4]]);
+const det2x2 = nekomaths.nekyu.determinant2x2(matrice2x2);
+console.log("Déterminant 2x2 :", det2x2); // 10
+
+// Créer une matrice identité 3x3
+const identite = nekomaths.nekyu.identite(3);
+console.log("Matrice identité :", identite.donnees);
+```
+
+### 15.6 Méthode de Newton-Raphson (nekonew)
+ * `nekonew.trouverRacine(func, derivee, x0, tolerance, maxIterations)` : Trouve une racine par Newton-Raphson.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Trouver la racine de x² - 2 = 0 (√2)
+const func = x => x * x - 2;
+const derivee = x => 2 * x;
+const resultat = nekomaths.nekonew.trouverRacine(func, derivee, 1);
+console.log("Racine trouvée :", resultat.racine); // ≈ 1.414
+console.log("Convergé :", resultat.converge);
+```
+
+### 15.7 Méthode de Monte Carlo (nekcarlo)
+ * `nekcarlo.estimerPi(nombrePoints)` : Estime π par simulation Monte Carlo.
+ * `nekcarlo.integrer(func, a, b, nombrePoints)` : Calcule une intégrale par Monte Carlo.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Estimer π
+const estimationPi = nekomaths.nekcarlo.estimerPi(1000000);
+console.log("Estimation de π :", estimationPi.estimation);
+console.log("Erreur :", estimationPi.erreur);
+
+// Intégrer x² de 0 à 1
+const integrale = nekomaths.nekcarlo.integrer(x => x * x, 0, 1, 100000);
+console.log("Intégrale de x² :", integrale.estimation); // ≈ 0.333
+```
+
+### 15.8 Interface Interactive (nekinterac)
+ * `nekinterac.creerMenu(options)` : Crée un menu interactif.
+ * `nekinterac.calculateur(operation)` : Affiche un calculateur interactif.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Créer un menu
+const menu = nekomaths.nekinterac.creerMenu({
+    titre: "Calculatrice",
+    choix: [
+        { nom: "Addition" },
+        { nom: "Multiplication" },
+        { nom: "Graphiques" }
+    ]
+});
+console.log(menu);
+
+// Interface de calculateur
+const calc = nekomaths.nekinterac.calculateur('addition');
+console.log(calc);
+```
+
+### 15.9 Conversions Avancées (nekconvert)
+ * `nekconvert.convertir(valeur, uniteSource, uniteCible, type)` : Convertit entre différentes unités.
+ * `nekconvert.convertirTemperature(valeur, uniteSource, uniteCible)` : Conversions de température.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Conversion de longueur
+const metres = nekomaths.nekconvert.convertir(100, 'metre', 'pied', 'longueur');
+console.log("100 mètres =", metres, "pieds");
+
+// Conversion de température
+const fahrenheit = nekomaths.nekconvert.convertirTemperature(0, 'celsius', 'fahrenheit');
+console.log("0°C =", fahrenheit, "°F"); // 32°F
+
+// Conversion de poids
+const livres = nekomaths.nekconvert.convertir(10, 'kilogramme', 'livre', 'poids');
+console.log("10 kg =", livres, "livres");
+```
+
+### 15.10 Historique des Calculs (nekohis)
+ * `nekohis.ajouter(operation, resultat, parametres)` : Ajoute un calcul à l'historique.
+ * `nekohis.obtenirHistorique()` : Récupère l'historique complet.
+ * `nekohis.reutiliser(id)` : Réutilise un calcul précédent.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Ajouter des calculs à l'historique
+nekomaths.nekohis.ajouter("Addition", 15, [10, 5]);
+nekomaths.nekohis.ajouter("Multiplication", 50, [10, 5]);
+
+// Voir l'historique
+const historique = nekomaths.nekohis.obtenirHistorique();
+console.log("Historique :", historique);
+
+// Réutiliser un résultat
+const ancienResultat = nekomaths.nekohis.reutiliser(1);
+console.log("Ancien résultat :", ancienResultat);
+```
+
+### 15.11 Algorithmes d'Optimisation (nekalgo)
+ * `nekalgo.descenteGradient(func, gradient, x0, tauxApprentissage, maxIterations)` : Optimisation par descente de gradient.
+ * `nekalgo.rechercheBruteForce(func, a, b, pas)` : Recherche par force brute.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Minimiser f(x) = x² - 4x + 3
+const func = x => x * x - 4 * x + 3;
+const gradient = x => 2 * x - 4;
+const resultat = nekomaths.nekalgo.descenteGradient(func, gradient, 0, 0.1);
+console.log("Minimum trouvé en x =", resultat.minimum); // ≈ 2
+console.log("Valeur minimum =", resultat.valeurMinimum); // ≈ -1
+
+// Recherche par force brute
+const brutForce = nekomaths.nekalgo.rechercheBruteForce(func, 0, 5, 0.01);
+console.log("Minimum par force brute :", brutForce);
+```
+
+### 15.12 Algorithmes Personnalisés (nekeit)
+ * `nekeit.creer(nom, algorithme, description)` : Crée un algorithme personnalisé.
+ * `nekeit.executer(nom, ...args)` : Exécute un algorithme.
+ * `nekeit.lister()` : Liste tous les algorithmes.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Créer un algorithme personnalisé
+nekomaths.nekeit.creer("fibonacci", function(n) {
+    if (n <= 1) return n;
+    return this.executer("fibonacci", n-1) + this.executer("fibonacci", n-2);
+}, "Calcule le n-ième nombre de Fibonacci");
+
+// Créer un algorithme de tri
+nekomaths.nekeit.creer("triRapide", function(arr) {
+    if (arr.length <= 1) return arr;
+    const pivot = arr[Math.floor(arr.length / 2)];
+    const left = arr.filter(x => x < pivot);
+    const middle = arr.filter(x => x === pivot);
+    const right = arr.filter(x => x > pivot);
+    return [...this.executer("triRapide", left), ...middle, ...this.executer("triRapide", right)];
+}, "Tri rapide (quicksort)");
+
+// Exécuter les algorithmes
+console.log("Fibonacci(10) :", nekomaths.nekeit.executer("fibonacci", 10));
+console.log("Tri [3,1,4,1,5] :", nekomaths.nekeit.executer("triRapide", [3,1,4,1,5]));
+
+// Lister les algorithmes
+console.log("Algorithmes :", nekomaths.nekeit.lister());
+```
+
+### 15.13 Coûts de Distribution (neksrar)
+ * `neksrar.coutTransport(distance, coutParKm, poids)` : Calcule le coût de transport.
+ * `neksrar.coutStockage(volume, duree, coutParM3Jour)` : Calcule le coût de stockage.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Coût de transport
+const transport = nekomaths.neksrar.coutTransport(150, 1.2, 25);
+console.log("Coût de transport :", transport);
+// { distance: 150, coutParKm: 1.2, poids: 25, coutTotal: 198 }
+
+// Coût de stockage
+const stockage = nekomaths.neksrar.coutStockage(10, 30, 2.5);
+console.log("Coût de stockage :", stockage);
+// { volume: 10, duree: 30, coutTotal: 750 }
+```
+
+### 15.14 Gestion Financière d'Entreprise (nekgef)
+ * `nekgef.calculerBFR(stocks, creancesClients, dettesFournisseurs)` : Calcule le BFR.
+ * `nekgef.calculerFRNG(capitauxPermanents, immobilisations)` : Calcule le FRNG.
+ * `nekgef.calculerTresorerieNette(frng, bfr)` : Calcule la trésorerie nette.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Calcul du BFR
+const bfr = nekomaths.nekgef.calculerBFR(50000, 30000, 20000);
+console.log("BFR :", bfr);
+// { bfr: 60000, interpretation: "Besoin de financement" }
+
+// Calcul du FRNG
+const frng = nekomaths.nekgef.calculerFRNG(200000, 150000);
+console.log("FRNG :", frng);
+// { frng: 50000, interpretation: "Équilibre financier" }
+
+// Trésorerie nette
+const tresorerie = nekomaths.nekgef.calculerTresorerieNette(50000, 60000);
+console.log("Trésorerie :", tresorerie);
+// { tresorerieNette: -10000, interpretation: "Trésorerie négative" }
+```
+
+### 15.15 Calculs d'Immobilisations (nekpo)
+ * `nekpo.amortissementLineaire(valeurInitiale, dureeVie, valeurResiduelle)` : Calcule l'amortissement linéaire.
+ * `nekpo.plusMoinsValue(prixCession, valeurComptable)` : Calcule la plus ou moins-value de cession.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Amortissement linéaire d'un équipement
+const amortissement = nekomaths.nekpo.amortissementLineaire(100000, 5, 10000);
+console.log("Plan d'amortissement :", amortissement);
+// Annuité : 18000 par an pendant 5 ans
+
+// Plus ou moins-value de cession
+const cession = nekomaths.nekpo.plusMoinsValue(45000, 40000);
+console.log("Plus-value :", cession);
+// { plusMoinsValue: 5000, type: "Plus-value" }
+```
+
+### 15.16 TVA et Inflation (nekia)
+ * `nekia.calculerTVA(montantHT, tauxTVA)` : Calcule la TVA.
+ * `nekia.calculerHT(montantTTC, tauxTVA)` : Calcule le montant HT à partir du TTC.
+ * `nekia.calculerInflation(valeurInitiale, valeurFinale, annees)` : Calcule le taux d'inflation.
+
+```javascript
+const nekomaths = require('nekomaths');
+
+// Calcul de TVA
+const tva = nekomaths.nekia.calculerTVA(1000, 20);
+console.log("Calcul TVA :", tva);
+// { montantHT: 1000, montantTVA: 200, montantTTC: 1200 }
+
+// Calcul HT à partir du TTC
+const ht = nekomaths.nekia.calculerHT(1200, 20);
+console.log("Calcul HT :", ht);
+// { montantTTC: 1200, montantHT: 1000, montantTVA: 200 }
+
+// Calcul d'inflation
+const inflation = nekomaths.nekia.calculerInflation(100, 105, 1);
+console.log("Inflation :", inflation);
+// { tauxPourcentage: 5, interpretation: "5% d'inflation par an" }
+```
+
 **Contribution**
 
 Les contributions sont les bienvenues ! Si vous avez des idées de nouvelles fonctions, des améliorations ou des corrections de bugs, n'hésitez pas à ouvrir une issue ou à soumettre une pull request sur le dépôt GitHub.
